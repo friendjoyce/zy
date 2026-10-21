@@ -1,0 +1,6 @@
+[
+  {"query": "向量检索", "relevant": [{"source": "intro.md", "paragraph": 2}]},
+  {"query": "RAG", "relevant": [{"source": "intro.md", "paragraph": 3}]},
+  {"query": "Git commits", "relevant": [{"source": "intro.md", "paragraph": 4}]},
+  {"query": "检索", "relevant": [{"source": "intro.md", "paragraph": 2}, {"source": "intro.md", "paragraph": 3}]}
+]

@@ -22,7 +22,15 @@ python -m unittest -v
 
 - [x] 文档检索、原文出处、命令行入口
 - [x] 中文、英文、无匹配、数量限制和非法参数验证
-- [ ] 固定评估问题集与 Recall@k
+- [x] 固定评估问题集与 Recall@k
 - [ ] TF-IDF 与当前基线对比
 - [ ] 索引缓存
 - [ ] 问答接口与可选模型接入
+
+## 检索评估
+
+运行 `python evaluate.py --top-k 1` 或 `python evaluate.py --top-k 3`。
+固定题集位于 `evaluation/cases.json`，以文件名和段落序号标注相关原文。
+Recall@k = 前 k 条结果中的相关段落数 / 全部标注相关段落数，报告对问题取宏平均。
+当前 4 个示例问题实测 Recall@1 为 0.875，Recall@3 为 1.0。
+这是小型冒烟评估，不代表真实业务效果；改动资料段落后需同步核对标注。

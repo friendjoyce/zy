@@ -9,12 +9,15 @@
 ```sh
 python search.py "向量检索"
 python search.py "Git" --docs docs --top-k 2
+python search.py "Git" --json
 python -m unittest -v
 ```
 
 将 UTF-8 Markdown/TXT 放到 docs，或用 --docs 指定目录。程序按空行分段，以中文单字和英文词集合的 Jaccard 相似度排序，返回原文、文件名和段落序号。分数不是正确概率。当前不生成回答，不调用外部 API。
 
 ## 限制
+
+使用 `--json` 输出可供其他程序读取的 JSON 数组，每项包含 `score`、`source`、`paragraph`、`text`。无匹配时输出 `[]`。路径统一使用 `/`，中文以 JSON Unicode 转义输出，解析后保持原文，便于 Windows 管道传输。非法参数仍返回非零退出码并向标准错误输出提示。
 
 中文单字匹配较粗糙，不理解同义词；每次查询扫描目录，适合小规模资料；不支持 PDF。资料只在本机读取。
 

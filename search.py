@@ -1,4 +1,5 @@
 import argparse
+import json
 import re
 from pathlib import Path
 
@@ -29,11 +30,19 @@ def main():
     parser.add_argument('query')
     parser.add_argument('--docs', default='docs')
     parser.add_argument('--top-k', type=int, default=3)
+    parser.add_argument('--json', action='store_true', help='Emit structured results for other programs')
     args = parser.parse_args()
     try:
         hits = search(args.docs, args.query, args.top_k)
     except (ValueError, OSError, UnicodeError) as error:
         parser.error(str(error))
+    if args.json:
+        print(json.dumps([
+            {'score': score, 'source': source.replace('\\', '/'),
+             'paragraph': paragraph, 'text': text}
+            for score, source, paragraph, text in hits
+        ], ensure_ascii=True))
+        return
     for score, source, paragraph, text in hits:
         print(f'[{source}, paragraph {paragraph}] score={score:.3f}\n{text}\n')
     if not hits:

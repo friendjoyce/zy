@@ -10,7 +10,7 @@
 python search.py "向量检索"
 python search.py "Git" --docs docs --top-k 2
 python search.py "Git" --json
-python search.py "Git" --min-score 0.1 --json
+python search.py "Git" --min-score 0.1 --method tfidf --json
 python -m unittest -v
 ```
 
@@ -49,3 +49,7 @@ Recall@k = 前 k 条结果中的相关段落数 / 全部标注相关段落数，
 可分别以 0、0.1、0.3 运行，查看每题和宏平均 Recall@k 的变化。提高阈值可能过滤掉相关段落；零召回也会如实计入平均值，不会跳过无结果问题。
 阈值范围为 0 到 1，边界相等时保留结果；非法值返回非零退出码。
 该评估只衡量召回，不能据此证明精确率或答案质量提高。
+
+
+
+TF-IDF 基线可用 --method tfidf 启用；默认仍使用 Jaccard，便于对比两种词项权重策略。TF-IDF 分数只用于排序，不是概率。

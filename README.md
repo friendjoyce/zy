@@ -30,7 +30,7 @@ python -m unittest -v
 - [x] 中文、英文、无匹配、数量限制和非法参数验证
 - [x] 固定评估问题集与 Recall@k
 - [x] 相似度阈值评估与配置记录
-- [ ] TF-IDF 与当前基线对比
+- [x] TF-IDF 与当前基线对比
 - [ ] 索引缓存
 - [ ] 问答接口与可选模型接入
 
@@ -53,3 +53,6 @@ Recall@k = 前 k 条结果中的相关段落数 / 全部标注相关段落数，
 
 
 TF-IDF 基线可用 --method tfidf 启用；默认仍使用 Jaccard，便于对比两种词项权重策略。TF-IDF 分数只用于排序，不是概率。
+
+
+评估脚本也支持 `python evaluate.py --method tfidf`，报告会记录使用的评分方法，便于在同一题集上比较 Jaccard 与 TF-IDF。

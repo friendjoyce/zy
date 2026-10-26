@@ -11,16 +11,16 @@ def recall_at_k(retrieved, relevant, k):
     return len(set(retrieved[:k]) & set(relevant)) / len(set(relevant))
 
 
-def evaluate(docs, cases, k, min_score=0.0):
+def evaluate(docs, cases, k, min_score=0.0, method="jaccard"):
     if not cases or k < 1:
         raise ValueError('At least one case and positive k are required')
     rows = []
     for case in cases:
         relevant = [(item['source'], item['paragraph']) for item in case['relevant']]
-        hits = search(docs, case['query'], k, min_score=min_score)
+        hits = search(docs, case['query'], k, min_score=min_score, method=method)
         retrieved = [(source.replace('\\', '/'), paragraph) for _, source, paragraph, _ in hits]
         rows.append({'query': case['query'], 'recall': recall_at_k(retrieved, relevant, k)})
-    return {'k': k, 'min_score': min_score, 'queries': len(rows), 'mean_recall': sum(row['recall'] for row in rows) / len(rows), 'results': rows}
+    return {'k': k, 'method': method, 'min_score': min_score, 'queries': len(rows), 'mean_recall': sum(row['recall'] for row in rows) / len(rows), 'results': rows}
 
 
 def main():
@@ -28,12 +28,14 @@ def main():
     parser.add_argument('--docs', default='docs')
     parser.add_argument('--cases', default='evaluation/cases.json')
     parser.add_argument('--top-k', type=int, default=3)
+    parser.add_argument('--method', choices=['jaccard', 'tfidf'], default='jaccard',
+                        help='Scoring method (default: jaccard)')
     parser.add_argument('--min-score', type=float, default=0.0,
                         help='Minimum retrieval similarity, from 0 to 1 (default: 0)')
     args = parser.parse_args()
     try:
         cases = json.loads(Path(args.cases).read_text(encoding='utf-8-sig'))
-        report = evaluate(args.docs, cases, args.top_k, min_score=args.min_score)
+        report = evaluate(args.docs, cases, args.top_k, min_score=args.min_score, method=args.method)
     except (ValueError, OSError, KeyError, TypeError) as error:
         parser.error(str(error))
     print(json.dumps(report, ensure_ascii=True, indent=2))

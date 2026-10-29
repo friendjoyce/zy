@@ -56,3 +56,5 @@ TF-IDF 基线可用 --method tfidf 启用；默认仍使用 Jaccard，便于对�
 
 
 评估脚本也支持 `python evaluate.py --method tfidf`，报告会记录使用的评分方法，便于在同一题集上比较 Jaccard 与 TF-IDF。
+
+TF-IDF 使用原始词频、平滑 IDF = 1 + ln((N+1)/(df+1)) 和余弦相似度，分数范围为 0 到 1。N 为段落数；查询中未出现在语料里的词仍计入查询向量长度。修正前的 TF-IDF 分数不可直接沿用阈值。

@@ -2,7 +2,7 @@ import argparse
 import json
 import re
 from collections import Counter
-from math import log
+from math import log, sqrt
 from pathlib import Path
 
 
@@ -18,7 +18,8 @@ def search(root, query, limit=3, min_score=0.0, method='jaccard'):
         raise ValueError('min_score must be between 0 and 1')
     if method not in {'jaccard', 'tfidf'}:
         raise ValueError("method must be 'jaccard' or 'tfidf'")
-    query = tokens(query)
+    query_counts = Counter(re.findall(r"[a-z0-9_]+|[\u4e00-\u9fff]", query.lower()))
+    query = set(query_counts)
     documents = []
     for path in sorted(root.rglob('*')):
         if path.is_file() and path.suffix.lower() in {'.md', '.txt'}:
@@ -29,17 +30,22 @@ def search(root, query, limit=3, min_score=0.0, method='jaccard'):
     total_documents = len(documents)
     hits = []
     for path, number, text, words in documents:
-                overlap = len(query & words)
-                if overlap:
-                    if method == 'tfidf':
-                        query_counts = Counter(query)
-                        word_counts = Counter(words)
-                        score = sum(query_counts[token] * word_counts[token] * log((total_documents + 1) / (document_frequency[token] + 1)) for token in query & words)
-                        score /= (sum(query_counts.values()) * max(1, sum(word_counts.values())))
-                    else:
-                        score = overlap / len(query | words)
-                    if score >= min_score:
-                        hits.append((score, str(path.relative_to(root)), number, text.strip()))
+        overlap = query & words
+        if not overlap:
+            continue
+        if method == 'tfidf':
+            word_counts = Counter(re.findall(r'[a-z0-9_]+|[\u4e00-\u9fff]', text.lower()))
+            def weight(token):
+                return 1 + log((total_documents + 1) / (document_frequency[token] + 1))
+            q = {token: count * weight(token) for token, count in query_counts.items()}
+            d = {token: count * weight(token) for token, count in word_counts.items()}
+            score = sum(q[token] * d[token] for token in overlap)
+            score /= sqrt(sum(v*v for v in q.values())) * sqrt(sum(v*v for v in d.values()))
+            score = min(1.0, score)
+        else:
+            score = len(overlap) / len(query | words)
+        if score >= min_score:
+            hits.append((score, str(path.relative_to(root)), number, text.strip()))
     return sorted(hits, key=lambda hit: (-hit[0], hit[1], hit[2]))[:limit]
 
 
@@ -51,7 +57,7 @@ def main():
     parser.add_argument('--method', choices=['jaccard', 'tfidf'], default='jaccard',
                         help='Scoring method (default: jaccard)')
     parser.add_argument('--min-score', type=float, default=0.0,
-                        help='Minimum Jaccard similarity, from 0 to 1 (default: 0)')
+                        help='Minimum similarity, from 0 to 1 (default: 0)')
     parser.add_argument('--json', action='store_true', help='Emit structured results for other programs')
     args = parser.parse_args()
     try:

@@ -11,6 +11,17 @@ def recall_at_k(retrieved, relevant, k):
     return len(set(retrieved[:k]) & set(relevant)) / len(set(relevant))
 
 
+def reciprocal_rank_at_k(retrieved, relevant, k):
+    """Return reciprocal rank of the first relevant hit, or zero."""
+    if k < 1 or not relevant:
+        raise ValueError('k must be positive and relevant passages non-empty')
+    relevant = set(relevant)
+    for rank, passage in enumerate(retrieved[:k], 1):
+        if passage in relevant:
+            return 1 / rank
+    return 0.0
+
+
 def evaluate(docs, cases, k, min_score=0.0, method="jaccard"):
     if not cases or k < 1:
         raise ValueError('At least one case and positive k are required')
@@ -19,8 +30,8 @@ def evaluate(docs, cases, k, min_score=0.0, method="jaccard"):
         relevant = [(item['source'], item['paragraph']) for item in case['relevant']]
         hits = search(docs, case['query'], k, min_score=min_score, method=method)
         retrieved = [(source.replace('\\', '/'), paragraph) for _, source, paragraph, _ in hits]
-        rows.append({'query': case['query'], 'recall': recall_at_k(retrieved, relevant, k)})
-    return {'k': k, 'method': method, 'min_score': min_score, 'queries': len(rows), 'mean_recall': sum(row['recall'] for row in rows) / len(rows), 'results': rows}
+        rows.append({'query': case['query'], 'recall': recall_at_k(retrieved, relevant, k), 'reciprocal_rank': reciprocal_rank_at_k(retrieved, relevant, k)})
+    return {'k': k, 'method': method, 'min_score': min_score, 'queries': len(rows), 'mean_recall': sum(row['recall'] for row in rows) / len(rows), 'mrr': sum(row['reciprocal_rank'] for row in rows) / len(rows), 'results': rows}
 
 
 def main():

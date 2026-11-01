@@ -6,6 +6,8 @@
 
 ## 运行
 
+演示前可运行 `python doctor.py` 检查默认知识库；生成模式用 `python doctor.py --generate --model qwen3:4b`。详细说明见下方“启动自检”。
+
 需要 Python 3.10+，无额外依赖。在仓库根目录运行：
 
 ```sh
@@ -195,3 +197,16 @@ python compare_chunking.py --split test --output-dir evaluation/chunking
 ### 评估指标边界修正
 
 QA 评估的 Recall@3、MRR@3、Hit@1 现在使用一致的前三条候选范围。即使传入超过三条的结果，第四条之后的相关段落也不会计入 Recall@3；新增回归测试覆盖第四条未命中与第三条命中的边界。此前已保存的实验每题最多返回三条，因此该修正不改变这些历史结果，也不表示检索效果提升。
+
+### 启动自检
+
+```powershell
+python doctor.py
+python doctor.py --docs evaluation/multidoc/docs
+python doctor.py --generate --model qwen3:4b
+python doctor.py --generate --json
+```
+
+自检检查 Python 版本、Markdown/TXT 文件存在性、UTF-8 可读性及非空内容。默认仅检查检索准备状态，不连接模型；`--generate` 才查询本机 Ollama 的模型列表，检查 `--model` 或 `OLLAMA_MODEL` 指定的模型。未带标签的名称按 `:latest` 匹配。失败退出码为 1，参数错误为 2，全部通过为 0；`--json` 输出结构化报告。
+
+`--model` 只影响这次自检，不设置环境变量；启动网页仍需设置 `OLLAMA_MODEL`。工具不下载模型、不修改配置、不发送文档、不执行推理，也不检查 8080 端口、显存容量或回答质量。纯标题文件仍可能通过非空检查，因此通过不等于每种分块方式都能返回证据。需要验证生成时再运行 `smoke_local.py`。Windows 输出乱码时可使用 `--json`（ASCII 转义，解析后保留中文）。

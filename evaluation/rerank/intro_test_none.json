@@ -1,0 +1,226 @@
+{
+  "timestamp": "2026-11-01T07:03:34.993285+00:00",
+  "generate": false,
+  "model": null,
+  "rerank": "none",
+  "corpus_manifest": {
+    "intro.md": "7a5eae4003aa91d9e18cb804551a87f3b65e7ad9f39c16e1358067d6d316b2bf"
+  },
+  "corpus_hash_format": "sorted-json-path-to-sha256-v1",
+  "corpus_sha256": "2426e79bbd04f44ac4a90275e2adba16f007983d076d061f491d1b33ee923aea",
+  "cases_sha256": "17008989a07f24309ce8f971a6504f0e464db55cf699cd66405c0f409e16f4c7",
+  "results": [
+    {
+      "case": {
+        "id": "test-01",
+        "split": "test",
+        "category": "answerable",
+        "question": "RAG 提供出处是否就能确保答案正确？",
+        "relevant": [
+          3
+        ],
+        "expected": "不能；出处帮助核对但不保证正确。"
+      },
+      "result": {
+        "mode": "extractive",
+        "answer": "[1] RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。",
+        "sources": [
+          {
+            "id": 1,
+            "source": "intro.md",
+            "paragraph": 3,
+            "text": "RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。",
+            "score": 0.36074732617817357
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 1.07
+      }
+    },
+    {
+      "case": {
+        "id": "test-02",
+        "split": "test",
+        "category": "answerable",
+        "question": "How are code changes tracked in Git?",
+        "relevant": [
+          4
+        ],
+        "expected": "As commits."
+      },
+      "result": {
+        "mode": "extractive",
+        "answer": "[1] Git records code changes as commits.",
+        "sources": [
+          {
+            "id": 1,
+            "source": "intro.md",
+            "paragraph": 4,
+            "text": "Git records code changes as commits.",
+            "score": 0.37946636129383976
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 0.45
+      }
+    },
+    {
+      "case": {
+        "id": "test-03",
+        "split": "test",
+        "category": "answerable",
+        "question": "文本变成数值表示后，如何找到相近的材料？",
+        "relevant": [
+          2
+        ],
+        "expected": "通过向量相似度查找相关文档。"
+      },
+      "result": {
+        "mode": "extractive",
+        "answer": "[1] 向量检索将文本表示为向量，通过相似度查找相关文档。\n\n[2] # 示例资料\n\n[3] RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。",
+        "sources": [
+          {
+            "id": 1,
+            "source": "intro.md",
+            "paragraph": 2,
+            "text": "向量检索将文本表示为向量，通过相似度查找相关文档。",
+            "score": 0.23727755139531642
+          },
+          {
+            "id": 2,
+            "source": "intro.md",
+            "paragraph": 1,
+            "text": "# 示例资料",
+            "score": 0.16904871028704865
+          },
+          {
+            "id": 3,
+            "source": "intro.md",
+            "paragraph": 3,
+            "text": "RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。",
+            "score": 0.07551538362782678
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 0.45
+      }
+    },
+    {
+      "case": {
+        "id": "test-04",
+        "split": "test",
+        "category": "hard_negative",
+        "question": "RAG 的检索阶段在这台电脑上耗时多少毫秒？",
+        "relevant": [],
+        "expected": "证据没有耗时测量，不能给出毫秒数。"
+      },
+      "result": {
+        "mode": "extractive",
+        "answer": "[1] RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。\n\n[2] 向量检索将文本表示为向量，通过相似度查找相关文档。",
+        "sources": [
+          {
+            "id": 1,
+            "source": "intro.md",
+            "paragraph": 3,
+            "text": "RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。",
+            "score": 0.06942915437162596
+          },
+          {
+            "id": 2,
+            "source": "intro.md",
+            "paragraph": 2,
+            "text": "向量检索将文本表示为向量，通过相似度查找相关文档。",
+            "score": 0.044402002082233896
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 0.45
+      }
+    },
+    {
+      "case": {
+        "id": "test-05",
+        "split": "test",
+        "category": "hard_negative",
+        "question": "Git 请给出删除远程仓库的完整命令。",
+        "relevant": [],
+        "expected": "证据只有 Git 记录提交的介绍，不能据此提供删除命令。"
+      },
+      "result": {
+        "mode": "extractive",
+        "answer": "[1] Git records code changes as commits.\n\n[2] RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。",
+        "sources": [
+          {
+            "id": 1,
+            "source": "intro.md",
+            "paragraph": 4,
+            "text": "Git records code changes as commits.",
+            "score": 0.08124260272198304
+          },
+          {
+            "id": 2,
+            "source": "intro.md",
+            "paragraph": 3,
+            "text": "RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。",
+            "score": 0.06753669955465469
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 0.42
+      }
+    },
+    {
+      "case": {
+        "id": "test-06",
+        "split": "test",
+        "category": "no_match",
+        "question": "xxxxxxxx",
+        "relevant": [],
+        "expected": "无匹配，不调用模型。"
+      },
+      "result": {
+        "mode": "no_evidence",
+        "answer": "No matching evidence.",
+        "sources": [],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": false,
+          "semantic_verification": false
+        },
+        "latency_ms": 0.3
+      }
+    }
+  ],
+  "summary": {
+    "cases": 6,
+    "errors": 0,
+    "answerable_cases": 3,
+    "answerable_recall_at_3": 1.0,
+    "answerable_mrr_at_3": 1.0,
+    "answerable_hit_at_1": 1.0,
+    "completed_negative_cases": 3,
+    "negative_cases_with_hits": 2,
+    "semantic_quality_evaluated": false
+  },
+  "complete": true
+}

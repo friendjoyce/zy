@@ -5,10 +5,10 @@ import subprocess
 from search import search
 
 
-def answer(docs, question, model_command=None, limit=3):
+def answer(docs, question, model_command=None, limit=3, *, rerank='none'):
     if not question.strip():
         raise ValueError('Question must not be empty')
-    hits = search(docs, question, limit, method='tfidf')
+    hits = search(docs, question, limit, method='tfidf', rerank=rerank)
     sources = [{'id': i, 'source': source.replace('\\', '/'), 'paragraph': paragraph,
                 'text': text[:4000], 'score': score}
                for i, (score, source, paragraph, text) in enumerate(hits, 1)]
@@ -34,10 +34,11 @@ def main():
     parser.add_argument('question')
     parser.add_argument('--docs', default='docs')
     parser.add_argument('--model-command', help='Trusted executable and arguments as a JSON array; reads UTF-8 stdin, writes stdout')
+    parser.add_argument('--rerank', choices=['none', 'title'], default='none')
     args = parser.parse_args()
     try:
         command = json.loads(args.model_command) if args.model_command else None
-        print(json.dumps(answer(args.docs, args.question, command), ensure_ascii=True))
+        print(json.dumps(answer(args.docs, args.question, command, rerank=args.rerank), ensure_ascii=True))
     except (ValueError, OSError, subprocess.SubprocessError) as error:
         parser.error(str(error))
 

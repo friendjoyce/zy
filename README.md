@@ -149,3 +149,17 @@ Python 调用也可使用 `ask(question, generate=True, docs=Path("evaluation/mu
 新报告的 `corpus_manifest` 记录所有 Markdown/TXT 文件的路径和内容 SHA-256；`corpus_sha256` 改为该清单排序 JSON 的哈希，并有 `corpus_hash_format` 标识。此前没有该格式字段的报告只记录 `intro.md` 内容哈希，两种格式不可直接比较。
 
 真实运行与逐题检查见 `evaluation/multidoc/test_results.json`、`evaluation/multidoc/REVIEW.md`：四题无运行错误，模型区分新旧规则、列出冲突并在缺少并发数据时拒答。但 Orion 问题的首条检索结果是无关的 Lyra 文档；Recall@3 满分不能掩盖这个排名问题。该实验只有少量 AI 合成题，尚无独立人工复核。
+
+### 可选标题匹配重排
+
+`search.py`、`qa.py` 和 `evaluate_qa.py` 支持 `--rerank title`，默认 `none`。Python 接口 `search`、`answer`、`ask` 支持关键字参数 `rerank="title"`。网页仍采用默认检索策略。
+
+```powershell
+python qa.py "Orion 当前文档上传上限是多少？旧规则是否仍然适用？" --docs evaluation/multidoc/docs --rerank title
+python compare_rerank.py --split dev --output-dir evaluation/rerank
+python compare_rerank.py --split test --output-dir evaluation/rerank
+```
+
+该策略优先排列 Markdown 首行标题与问题存在英文词项匹配的候选文档，再按原相似度排序；在截断候选前执行，不改变相似度数值或阈值过滤。没有标题或没有匹配时退回原排序。它是简单词项规则，不是语义重排模型，不保证中文实体、别名或噪声标题下有效。
+
+评估新增可回答题的 MRR@3 和 Hit@1。实际对照中，多文档测试集三道可回答题 Hit@1 从 2/3 到 3/3，MRR@3 从 0.8333 到 1.0，Recall@3 保持 1.0；原题集指标不变。详见 `evaluation/rerank/REVIEW.md`。测试题此前已公开且用于发现问题，因此这些数值仅是小样本回归结果；本轮未重新生成答案，不能据此宣称回答质量提高。标题策略暂不设为默认。

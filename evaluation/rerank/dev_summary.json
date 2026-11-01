@@ -1,0 +1,58 @@
+[
+  {
+    "suite": "intro",
+    "split": "dev",
+    "rerank": "none",
+    "cases": 6,
+    "errors": 0,
+    "answerable_cases": 3,
+    "answerable_recall_at_3": 1.0,
+    "answerable_mrr_at_3": 1.0,
+    "answerable_hit_at_1": 1.0,
+    "completed_negative_cases": 3,
+    "negative_cases_with_hits": 2,
+    "semantic_quality_evaluated": false
+  },
+  {
+    "suite": "intro",
+    "split": "dev",
+    "rerank": "title",
+    "cases": 6,
+    "errors": 0,
+    "answerable_cases": 3,
+    "answerable_recall_at_3": 1.0,
+    "answerable_mrr_at_3": 1.0,
+    "answerable_hit_at_1": 1.0,
+    "completed_negative_cases": 3,
+    "negative_cases_with_hits": 2,
+    "semantic_quality_evaluated": false
+  },
+  {
+    "suite": "multidoc",
+    "split": "dev",
+    "rerank": "none",
+    "cases": 2,
+    "errors": 0,
+    "answerable_cases": 1,
+    "answerable_recall_at_3": 1.0,
+    "answerable_mrr_at_3": 1.0,
+    "answerable_hit_at_1": 1.0,
+    "completed_negative_cases": 1,
+    "negative_cases_with_hits": 1,
+    "semantic_quality_evaluated": false
+  },
+  {
+    "suite": "multidoc",
+    "split": "dev",
+    "rerank": "title",
+    "cases": 2,
+    "errors": 0,
+    "answerable_cases": 1,
+    "answerable_recall_at_3": 1.0,
+    "answerable_mrr_at_3": 1.0,
+    "answerable_hit_at_1": 1.0,
+    "completed_negative_cases": 1,
+    "negative_cases_with_hits": 1,
+    "semantic_quality_evaluated": false
+  }
+]

@@ -19,7 +19,7 @@ def cached_passages(path, modified, size):
                  for n, part in enumerate(re.split(r'\n\s*\n', text), 1))
 
 
-def search(root, query, limit=3, min_score=0.0, method='jaccard'):
+def search(root, query, limit=3, min_score=0.0, method='jaccard', *, rerank='none'):
     root = Path(root)
     if not root.is_dir() or limit < 1:
         raise ValueError('Document directory must exist and limit must be positive')
@@ -27,13 +27,21 @@ def search(root, query, limit=3, min_score=0.0, method='jaccard'):
         raise ValueError('min_score must be between 0 and 1')
     if method not in {'jaccard', 'tfidf'}:
         raise ValueError("method must be 'jaccard' or 'tfidf'")
+    if rerank not in {'none', 'title'}:
+        raise ValueError("rerank must be 'none' or 'title'")
     query_counts = Counter(re.findall(r"[a-z0-9_]+|[\u4e00-\u9fff]", query.lower()))
     query = set(query_counts)
     documents = []
+    title_terms = {}
     for path in sorted(root.rglob('*')):
         if path.is_file() and path.suffix.lower() in {'.md', '.txt'}:
             stat = path.stat()
-            for number, text, words in cached_passages(str(path.resolve()), stat.st_mtime_ns, stat.st_size):
+            passages = cached_passages(str(path.resolve()), stat.st_mtime_ns, stat.st_size)
+            first_line = next((text.splitlines()[0] for _, text, _ in passages if text), '')
+            title_terms[str(path.relative_to(root))] = (
+                set(re.findall(r'[a-z][a-z0-9_]*', first_line.lower()))
+                if re.match(r'^#{1,6}\s+', first_line) else set())
+            for number, text, words in passages:
                 documents.append((path, number, text, words))
     document_frequency = Counter(token for _, _, _, words in documents for token in set(words))
     total_documents = len(documents)
@@ -55,7 +63,10 @@ def search(root, query, limit=3, min_score=0.0, method='jaccard'):
             score = len(overlap) / len(query | words)
         if score >= min_score:
             hits.append((score, str(path.relative_to(root)), number, text.strip()))
-    return sorted(hits, key=lambda hit: (-hit[0], hit[1], hit[2]))[:limit]
+    # Reorder all matching candidates before truncation; scores remain lexical similarity.
+    return sorted(hits, key=lambda hit: (
+        -len(query & title_terms[hit[1]]) if rerank == 'title' else 0,
+        -hit[0], hit[1], hit[2]))[:limit]
 
 
 def main():
@@ -68,9 +79,10 @@ def main():
     parser.add_argument('--min-score', type=float, default=0.0,
                         help='Minimum similarity, from 0 to 1 (default: 0)')
     parser.add_argument('--json', action='store_true', help='Emit structured results for other programs')
+    parser.add_argument('--rerank', choices=['none', 'title'], default='none')
     args = parser.parse_args()
     try:
-        hits = search(args.docs, args.query, args.top_k, args.min_score, args.method)
+        hits = search(args.docs, args.query, args.top_k, args.min_score, args.method, rerank=args.rerank)
     except (ValueError, OSError, UnicodeError) as error:
         parser.error(str(error))
     if args.json:

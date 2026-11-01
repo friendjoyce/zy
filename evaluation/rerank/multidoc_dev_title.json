@@ -1,0 +1,121 @@
+{
+  "timestamp": "2026-11-01T07:03:20.974820+00:00",
+  "generate": false,
+  "model": null,
+  "rerank": "title",
+  "corpus_manifest": {
+    "lyra.md": "76a4aac4920fd5da894254d896413997a2332b55f401577f8f39375ef85401ea",
+    "orion_archived.md": "7151cb48281d5f58daae728f630dae6753cf9217fc78ddf85ba284ffaab233d6",
+    "orion_current.md": "7d0857dc4bf8ca0250bb9f222f99a7ce4adbab50ee62e5152c0a34c0e6b3c849",
+    "vega_a.md": "75fe1dbdf92c960616e80f609f6017529645c4e721b8397e2e52ee931f7a82df",
+    "vega_b.md": "9f371656309dd90fb4197c3551aa0ba8852e4bec90d8f1217dd4ee097ec3117c"
+  },
+  "corpus_hash_format": "sorted-json-path-to-sha256-v1",
+  "corpus_sha256": "95df2e43b267de8d047d5b13fa68c5679a2ad065660a3ab9f312e3e69e1228f8",
+  "cases_sha256": "104b468124f1f9dfe6eff50906782afcabb683b1f1b2bebfd66aa894c28084d0",
+  "results": [
+    {
+      "case": {
+        "id": "multi-dev-01",
+        "split": "dev",
+        "category": "answerable",
+        "question": "Lyra 文档上传上限是多少？",
+        "relevant": [
+          {
+            "source": "lyra.md",
+            "paragraph": 2
+          }
+        ],
+        "expected": "50 MB，不应使用 Orion 的规则。"
+      },
+      "result": {
+        "mode": "extractive",
+        "answer": "[1] Lyra 文档上传上限为每个文件 50 MB。Lyra 是另一个虚构产品，不能用此规则回答 Orion 的问题。\n\n[2] # 虚构测试资料：Lyra 规则\n\n[3] Orion 文档上传上限：2026-09-01 的旧规则为每个文件 10 MB；此规则已归档，由 2026-10-01 起生效的新规则替代。",
+        "sources": [
+          {
+            "id": 1,
+            "source": "lyra.md",
+            "paragraph": 2,
+            "text": "Lyra 文档上传上限为每个文件 50 MB。Lyra 是另一个虚构产品，不能用此规则回答 Orion 的问题。",
+            "score": 0.43568094935038004
+          },
+          {
+            "id": 2,
+            "source": "lyra.md",
+            "paragraph": 1,
+            "text": "# 虚构测试资料：Lyra 规则",
+            "score": 0.13913147044395616
+          },
+          {
+            "id": 3,
+            "source": "orion_archived.md",
+            "paragraph": 2,
+            "text": "Orion 文档上传上限：2026-09-01 的旧规则为每个文件 10 MB；此规则已归档，由 2026-10-01 起生效的新规则替代。",
+            "score": 0.25928366567354305
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 1.21
+      }
+    },
+    {
+      "case": {
+        "id": "multi-dev-02",
+        "split": "dev",
+        "category": "hard_negative",
+        "question": "Orion 文档响应耗时是多少毫秒？",
+        "relevant": [],
+        "expected": "资料没有耗时数值，应说明证据不足。"
+      },
+      "result": {
+        "mode": "extractive",
+        "answer": "[1] Orion 文档支持 Markdown 和 TXT；不支持 PDF。当前规则没有提供并发用户数或响应耗时。\n\n[2] Orion 文档上传上限：2026-10-01 起生效的当前规则为每个文件 20 MB，替代 2026-09-01 的旧规则。仅用于测试，不对应真实产品。\n\n[3] Orion 文档上传上限：2026-09-01 的旧规则为每个文件 10 MB；此规则已归档，由 2026-10-01 起生效的新规则替代。",
+        "sources": [
+          {
+            "id": 1,
+            "source": "orion_current.md",
+            "paragraph": 3,
+            "text": "Orion 文档支持 Markdown 和 TXT；不支持 PDF。当前规则没有提供并发用户数或响应耗时。",
+            "score": 0.2567049590804181
+          },
+          {
+            "id": 2,
+            "source": "orion_current.md",
+            "paragraph": 2,
+            "text": "Orion 文档上传上限：2026-10-01 起生效的当前规则为每个文件 20 MB，替代 2026-09-01 的旧规则。仅用于测试，不对应真实产品。",
+            "score": 0.09668003746485467
+          },
+          {
+            "id": 3,
+            "source": "orion_archived.md",
+            "paragraph": 2,
+            "text": "Orion 文档上传上限：2026-09-01 的旧规则为每个文件 10 MB；此规则已归档，由 2026-10-01 起生效的新规则替代。",
+            "score": 0.07625804779591588
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 1.37
+      }
+    }
+  ],
+  "summary": {
+    "cases": 2,
+    "errors": 0,
+    "answerable_cases": 1,
+    "answerable_recall_at_3": 1.0,
+    "answerable_mrr_at_3": 1.0,
+    "answerable_hit_at_1": 1.0,
+    "completed_negative_cases": 1,
+    "negative_cases_with_hits": 1,
+    "semantic_quality_evaluated": false
+  },
+  "complete": true
+}

@@ -1,0 +1,14 @@
+[
+  {"id":"dev-01","split":"dev","category":"answerable","question":"RAG 的处理顺序是什么？","relevant":[3],"expected":"先检索文档，再交给语言模型生成回答。"},
+  {"id":"dev-02","split":"dev","category":"answerable","question":"向量检索用什么查找相关文档？","relevant":[2],"expected":"将文本表示为向量，通过相似度查找。"},
+  {"id":"dev-03","split":"dev","category":"answerable","question":"What does Git record?","relevant":[4],"expected":"Code changes as commits."},
+  {"id":"dev-04","split":"dev","category":"hard_negative","question":"RAG 在这个项目上的准确率是多少？","relevant":[],"expected":"证据没有准确率，不应编造数值。"},
+  {"id":"dev-05","split":"dev","category":"hard_negative","question":"Git 的作者出生在哪一天？","relevant":[],"expected":"证据没有作者或出生日期，应拒答。"},
+  {"id":"dev-06","split":"dev","category":"no_match","question":"zzzzzzzz","relevant":[],"expected":"无匹配，不调用模型。"},
+  {"id":"test-01","split":"test","category":"answerable","question":"RAG 提供出处是否就能确保答案正确？","relevant":[3],"expected":"不能；出处帮助核对但不保证正确。"},
+  {"id":"test-02","split":"test","category":"answerable","question":"How are code changes tracked in Git?","relevant":[4],"expected":"As commits."},
+  {"id":"test-03","split":"test","category":"answerable","question":"文本变成数值表示后，如何找到相近的材料？","relevant":[2],"expected":"通过向量相似度查找相关文档。"},
+  {"id":"test-04","split":"test","category":"hard_negative","question":"RAG 的检索阶段在这台电脑上耗时多少毫秒？","relevant":[],"expected":"证据没有耗时测量，不能给出毫秒数。"},
+  {"id":"test-05","split":"test","category":"hard_negative","question":"Git 请给出删除远程仓库的完整命令。","relevant":[],"expected":"证据只有 Git 记录提交的介绍，不能据此提供删除命令。"},
+  {"id":"test-06","split":"test","category":"no_match","question":"xxxxxxxx","relevant":[],"expected":"无匹配，不调用模型。"}
+]

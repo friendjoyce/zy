@@ -114,4 +114,20 @@ python smoke_local.py --output evaluation/local_smoke.json
 
 2026-11-01 实际记录见 `evaluation/local_smoke.json`：Ollama 0.40.13、qwen3:4b（Q4_K_M）、RTX 4060 Laptop 8 GB。RAG 和 Git 两题生成成功，引用编号均存在；两个无匹配输入返回 `no_evidence`。RAG 首次调用耗时 72.54 秒，Git 随后调用耗时 21.45 秒，未分离加载、思考与生成时间。四个调用无运行错误，不代表答案准确率为 100%。
 
-人工检查发现：RAG 回答补充了证据未给出的英文全称 Retrieval-Augmented Generation。即使该扩展符合常识，也不满足严格的“仅依据证据”约束，而引用编号检查无法发现这类问题。本轮无答案问题都未召回段落，尚未验证“召回了无关段落时模型能否拒答”；仍需扩充困难负例。
+人工检查发现：RAG 回答补充了证据未给出的英文全称 Retrieval-Augmented Generation。即使该扩展符合常识，也不满足严格的“仅依据证据”约束，而引用编号检查无法发现这类问题。该轮无答案问题都未召回段落；后续困难负例验证见下节。
+
+### 困难负例与开发/测试划分
+
+`evaluation/qa_cases.json` 新增 12 题，dev/test 各 6 题：每组有 3 个可回答问题、2 个有词项命中但证据不支持答案的困难负例、1 个无匹配输入。包含中文同义表达和英文问题。题目和预期答案由 AI 根据现有示例语料编写，问题不重复，但共享同一份小语料、主题相近，不是独立人工标注的业务测试集，也不足以证明泛化能力。原四题检索基准仍保留，结果不能与新题集直接混算。
+
+```powershell
+python evaluate_qa.py --split dev --output evaluation/qa_dev_retrieval.json
+$env:OLLAMA_MODEL="qwen3:4b"
+python evaluate_qa.py --split test --generate --output evaluation/qa_test_results.json
+```
+
+默认只检索；`--generate` 才会实际调用本地模型。每完成一题便保存原始回答、证据、预期答案、错误及语料/题集哈希，`complete` 表示所有题均已尝试，不等于全部成功。调用失败使退出码非零。报告的 Recall@3 只对可回答题计算，错误按未命中计入；无答案题单独统计有检索命中的数量，**该数量不是错误回答数或拒答率**。拒答要阅读全文判断，不能靠引用合法或包含某个词判分。
+
+本轮固定现有提示词后运行测试集，不根据测试题调参；后续可用 dev 调整，再重新报告 test 结果。测试题已经公开，若持续据此修改实现，应另建未用于调参的测试集。独立人工复核和更丰富的文档仍在待办中。
+
+本轮实际结果：测试集六题无运行错误，三道可回答题 Recall@3 = 1.0；两道困难负例都召回了无关段落，但模型回答“insufficient evidence”；无匹配题未调用模型。见 `evaluation/qa_test_results.json` 和逐题检查 `evaluation/qa_review.md`。检查由开发助手完成，不是独立人工评测；这些小样本结果不可包装为通用准确率或业务提升。

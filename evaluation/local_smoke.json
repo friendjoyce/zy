@@ -1,0 +1,106 @@
+{
+  "timestamp": "2026-11-01T06:50:30.451639+00:00",
+  "model": "qwen3:4b",
+  "quality_evaluated": false,
+  "cases": [
+    {
+      "question": "RAG",
+      "result": {
+        "mode": "generated",
+        "answer": "RAG (Retrieval-Augmented Generation) first retrieves relevant documents and then passes them to a language model to generate answers. The source of the retrieved documents can help verify the answer, but does not guarantee its correctness [1].",
+        "sources": [
+          {
+            "id": 1,
+            "source": "intro.md",
+            "paragraph": 3,
+            "text": "RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。",
+            "score": 0.169687708252722
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 72535.77
+      }
+    },
+    {
+      "question": "Git",
+      "result": {
+        "mode": "generated",
+        "answer": "Git records code changes as commits. [1]",
+        "sources": [
+          {
+            "id": 1,
+            "source": "intro.md",
+            "paragraph": 4,
+            "text": "Git records code changes as commits.",
+            "score": 0.408248290463863
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 21445.29
+      }
+    },
+    {
+      "question": "火星基地的食堂菜单是什么？",
+      "result": {
+        "mode": "no_evidence",
+        "answer": "No matching evidence.",
+        "sources": [],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": false,
+          "semantic_verification": false
+        },
+        "latency_ms": 0.49
+      }
+    },
+    {
+      "question": "zzzzzzzz",
+      "result": {
+        "mode": "no_evidence",
+        "answer": "No matching evidence.",
+        "sources": [],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": false,
+          "semantic_verification": false
+        },
+        "latency_ms": 0.28
+      }
+    }
+  ],
+  "installed_models": [
+    {
+      "name": "qwen3:4b",
+      "model": "qwen3:4b",
+      "modified_at": "2026-11-01T14:50:14.8179252+08:00",
+      "size": 2497293931,
+      "digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen3",
+        "families": [
+          "qwen3"
+        ],
+        "parameter_size": "4.0B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 262144,
+        "embedding_length": 2560,
+        "runner": "ggml"
+      },
+      "capabilities": [
+        "completion",
+        "tools",
+        "thinking"
+      ]
+    }
+  ]
+}

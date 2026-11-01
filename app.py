@@ -11,11 +11,11 @@ from qa import answer
 ROOT = Path(__file__).parent
 
 
-def ask(question, generate=False, *, docs=None, rerank='none'):
+def ask(question, generate=False, *, docs=None, rerank='none', chunking='paragraph'):
     started = time.perf_counter()
     if not isinstance(question, str) or not 1 <= len(question.strip()) <= 2000:
         raise ValueError('Question must contain 1-2000 characters')
-    report = answer(ROOT / 'docs' if docs is None else docs, question, rerank=rerank)
+    report = answer(ROOT / 'docs' if docs is None else docs, question, rerank=rerank, chunking=chunking)
     if generate and report['sources']:
         model = os.environ.get('OLLAMA_MODEL')
         if not model:

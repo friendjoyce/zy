@@ -163,3 +163,19 @@ python compare_rerank.py --split test --output-dir evaluation/rerank
 该策略优先排列 Markdown 首行标题与问题存在英文词项匹配的候选文档，再按原相似度排序；在截断候选前执行，不改变相似度数值或阈值过滤。没有标题或没有匹配时退回原排序。它是简单词项规则，不是语义重排模型，不保证中文实体、别名或噪声标题下有效。
 
 评估新增可回答题的 MRR@3 和 Hit@1。实际对照中，多文档测试集三道可回答题 Hit@1 从 2/3 到 3/3，MRR@3 从 0.8333 到 1.0，Recall@3 保持 1.0；原题集指标不变。详见 `evaluation/rerank/REVIEW.md`。测试题此前已公开且用于发现问题，因此这些数值仅是小样本回归结果；本轮未重新生成答案，不能据此宣称回答质量提高。标题策略暂不设为默认。
+
+### 标题随正文分块
+
+新增可选 `--chunking heading_context`，可用于 `search.py`、`qa.py`、`evaluate_qa.py`；Python 的 `search`、`answer`、`ask` 接受同名关键字参数。默认仍为 `paragraph`，网页默认行为不变。
+
+对 Markdown 文件，独立的 ATX 标题块（`#` 至 `######`）不再单独进入候选集，而是按层级附在后续正文前。正文仍以原空行分段编号定位；返回文本包含继承标题，不再只是该编号的原文。TXT 文件保持原行为。标题变化会通过原文件缓存失效机制反映。
+
+```powershell
+python qa.py "Orion 当前文档上传上限是多少？" --docs evaluation/multidoc/docs --rerank title --chunking heading_context
+python compare_chunking.py --split dev --output-dir evaluation/chunking
+python compare_chunking.py --split test --output-dir evaluation/chunking
+```
+
+分块对照固定 `rerank=title`，只改变分块方式。两套测试题合计 21 条检索结果中，纯标题结果从 3 条降为 0 条；可回答题的 Recall@3、MRR@3、Hit@1 均未下降。见 `evaluation/chunking` 中原始结果及检查记录。统计按各次检索返回条目计数，并非独立文档数。
+
+这是受限的 Markdown 规则，不是完整解析器：仅将独立标题块继承到正文；标题与正文没有空行时保留原块，Setext 标题、列表等不做专门处理。围栏代码中的井号不会被当作标题删除，但代码仍沿用原空行切分。重复标题增加上下文长度并改变词频/IDF，分数及阈值不可与旧模式直接混用；长段落仍受问答入口 4000 字符截断限制。更大的独立语料验证之前不更改默认模式。

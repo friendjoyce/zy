@@ -1,0 +1,213 @@
+{
+  "timestamp": "2026-11-01T07:20:42.008762+00:00",
+  "generate": false,
+  "model": null,
+  "rerank": "title",
+  "chunking": "paragraph",
+  "corpus_manifest": {
+    "intro.md": "7a5eae4003aa91d9e18cb804551a87f3b65e7ad9f39c16e1358067d6d316b2bf"
+  },
+  "corpus_hash_format": "sorted-json-path-to-sha256-v1",
+  "corpus_sha256": "2426e79bbd04f44ac4a90275e2adba16f007983d076d061f491d1b33ee923aea",
+  "cases_sha256": "f598a61c3b0ff9d46b5bdd0ccc92d57bfc396e79af11d0a0e128e9feeb471f36",
+  "results": [
+    {
+      "case": {
+        "id": "dev-01",
+        "split": "dev",
+        "category": "answerable",
+        "question": "RAG 的处理顺序是什么？",
+        "relevant": [
+          3
+        ],
+        "expected": "先检索文档，再交给语言模型生成回答。"
+      },
+      "result": {
+        "mode": "extractive",
+        "answer": "[1] RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。",
+        "sources": [
+          {
+            "id": 1,
+            "source": "intro.md",
+            "paragraph": 3,
+            "text": "RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。",
+            "score": 0.08768531420218732
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 1.09
+      }
+    },
+    {
+      "case": {
+        "id": "dev-02",
+        "split": "dev",
+        "category": "answerable",
+        "question": "向量检索用什么查找相关文档？",
+        "relevant": [
+          2
+        ],
+        "expected": "将文本表示为向量，通过相似度查找。"
+      },
+      "result": {
+        "mode": "extractive",
+        "answer": "[1] 向量检索将文本表示为向量，通过相似度查找相关文档。\n\n[2] RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。",
+        "sources": [
+          {
+            "id": 1,
+            "source": "intro.md",
+            "paragraph": 2,
+            "text": "向量检索将文本表示为向量，通过相似度查找相关文档。",
+            "score": 0.5893248030371854
+          },
+          {
+            "id": 2,
+            "source": "intro.md",
+            "paragraph": 3,
+            "text": "RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。",
+            "score": 0.17358282739950795
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 0.52
+      }
+    },
+    {
+      "case": {
+        "id": "dev-03",
+        "split": "dev",
+        "category": "answerable",
+        "question": "What does Git record?",
+        "relevant": [
+          4
+        ],
+        "expected": "Code changes as commits."
+      },
+      "result": {
+        "mode": "extractive",
+        "answer": "[1] Git records code changes as commits.",
+        "sources": [
+          {
+            "id": 1,
+            "source": "intro.md",
+            "paragraph": 4,
+            "text": "Git records code changes as commits.",
+            "score": 0.1593603359599363
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 0.41
+      }
+    },
+    {
+      "case": {
+        "id": "dev-04",
+        "split": "dev",
+        "category": "hard_negative",
+        "question": "RAG 在这个项目上的准确率是多少？",
+        "relevant": [],
+        "expected": "证据没有准确率，不应编造数值。"
+      },
+      "result": {
+        "mode": "extractive",
+        "answer": "[1] RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。",
+        "sources": [
+          {
+            "id": 1,
+            "source": "intro.md",
+            "paragraph": 3,
+            "text": "RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。",
+            "score": 0.0689150771497792
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 0.37
+      }
+    },
+    {
+      "case": {
+        "id": "dev-05",
+        "split": "dev",
+        "category": "hard_negative",
+        "question": "Git 的作者出生在哪一天？",
+        "relevant": [],
+        "expected": "证据没有作者或出生日期，应拒答。"
+      },
+      "result": {
+        "mode": "extractive",
+        "answer": "[1] Git records code changes as commits.\n\n[2] RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。",
+        "sources": [
+          {
+            "id": 1,
+            "source": "intro.md",
+            "paragraph": 4,
+            "text": "Git records code changes as commits.",
+            "score": 0.1021264479638977
+          },
+          {
+            "id": 2,
+            "source": "intro.md",
+            "paragraph": 3,
+            "text": "RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。",
+            "score": 0.08489736913432899
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 0.42
+      }
+    },
+    {
+      "case": {
+        "id": "dev-06",
+        "split": "dev",
+        "category": "no_match",
+        "question": "zzzzzzzz",
+        "relevant": [],
+        "expected": "无匹配，不调用模型。"
+      },
+      "result": {
+        "mode": "no_evidence",
+        "answer": "No matching evidence.",
+        "sources": [],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": false,
+          "semantic_verification": false
+        },
+        "latency_ms": 0.32
+      }
+    }
+  ],
+  "summary": {
+    "cases": 6,
+    "errors": 0,
+    "answerable_cases": 3,
+    "answerable_recall_at_3": 1.0,
+    "answerable_mrr_at_3": 1.0,
+    "answerable_hit_at_1": 1.0,
+    "completed_negative_cases": 3,
+    "negative_cases_with_hits": 2,
+    "semantic_quality_evaluated": false
+  },
+  "complete": true
+}

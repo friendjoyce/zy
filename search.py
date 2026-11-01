@@ -19,7 +19,34 @@ def cached_passages(path, modified, size):
                  for n, part in enumerate(re.split(r'\n\s*\n', text), 1))
 
 
-def search(root, query, limit=3, min_score=0.0, method='jaccard', *, rerank='none'):
+def contextual_passages(passages):
+    """Attach standalone ATX headings to bodies without changing paragraph IDs."""
+    headings = []
+    fence = None
+    for number, text, words in passages:
+        lines = text.splitlines()
+        matches = [re.fullmatch(r'(#{1,6})\s+(.+?)\s*#*\s*', line) for line in lines]
+        if fence is None and lines and all(matches):
+            for match in matches:
+                level = len(match[1])
+                headings = [(n, title) for n, title in headings if n < level]
+                headings.append((level, match[2]))
+            continue
+        for line in lines:
+            marker = re.match(r'^\s{0,3}(`{3,}|~{3,})(.*)$', line)
+            if marker:
+                run, rest = marker.groups()
+                if fence is None:
+                    fence = (run[0], len(run))
+                elif run[0] == fence[0] and len(run) >= fence[1] and not rest.strip():
+                    fence = None
+        if text:
+            context = '\n'.join('#' * level + ' ' + title for level, title in headings)
+            combined = context + '\n\n' + text if context else text
+            yield number, combined, frozenset(tokens(combined))
+
+
+def search(root, query, limit=3, min_score=0.0, method='jaccard', *, rerank='none', chunking='paragraph'):
     root = Path(root)
     if not root.is_dir() or limit < 1:
         raise ValueError('Document directory must exist and limit must be positive')
@@ -29,6 +56,8 @@ def search(root, query, limit=3, min_score=0.0, method='jaccard', *, rerank='non
         raise ValueError("method must be 'jaccard' or 'tfidf'")
     if rerank not in {'none', 'title'}:
         raise ValueError("rerank must be 'none' or 'title'")
+    if chunking not in {'paragraph', 'heading_context'}:
+        raise ValueError("chunking must be 'paragraph' or 'heading_context'")
     query_counts = Counter(re.findall(r"[a-z0-9_]+|[\u4e00-\u9fff]", query.lower()))
     query = set(query_counts)
     documents = []
@@ -41,6 +70,8 @@ def search(root, query, limit=3, min_score=0.0, method='jaccard', *, rerank='non
             title_terms[str(path.relative_to(root))] = (
                 set(re.findall(r'[a-z][a-z0-9_]*', first_line.lower()))
                 if re.match(r'^#{1,6}\s+', first_line) else set())
+            if chunking == 'heading_context' and path.suffix.lower() == '.md':
+                passages = contextual_passages(passages)
             for number, text, words in passages:
                 documents.append((path, number, text, words))
     document_frequency = Counter(token for _, _, _, words in documents for token in set(words))
@@ -80,9 +111,10 @@ def main():
                         help='Minimum similarity, from 0 to 1 (default: 0)')
     parser.add_argument('--json', action='store_true', help='Emit structured results for other programs')
     parser.add_argument('--rerank', choices=['none', 'title'], default='none')
+    parser.add_argument('--chunking', choices=['paragraph', 'heading_context'], default='paragraph')
     args = parser.parse_args()
     try:
-        hits = search(args.docs, args.query, args.top_k, args.min_score, args.method, rerank=args.rerank)
+        hits = search(args.docs, args.query, args.top_k, args.min_score, args.method, rerank=args.rerank, chunking=args.chunking)
     except (ValueError, OSError, UnicodeError) as error:
         parser.error(str(error))
     if args.json:

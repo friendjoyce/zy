@@ -48,14 +48,14 @@ def summarize(rows):
     }
 
 
-def run(cases, generate, output, docs=None, rerank='none'):
+def run(cases, generate, output, docs=None, rerank='none', chunking='paragraph'):
     if not cases:
         raise ValueError('No cases selected')
     docs = ROOT / 'docs' if docs is None else Path(docs)
     manifest = corpus_manifest(docs)
     report = {'timestamp': datetime.now(timezone.utc).isoformat(),
               'generate': generate, 'model': os.environ.get('OLLAMA_MODEL') if generate else None,
-              'rerank': rerank,
+              'rerank': rerank, 'chunking': chunking,
               'corpus_manifest': manifest,
               'corpus_hash_format': 'sorted-json-path-to-sha256-v1',
               'corpus_sha256': hashlib.sha256(json.dumps(manifest, sort_keys=True).encode()).hexdigest(),
@@ -65,7 +65,7 @@ def run(cases, generate, output, docs=None, rerank='none'):
     for case in cases:
         row = {'case': case}
         try:
-            row['result'] = ask(case['question'], generate=generate, docs=docs, rerank=rerank)
+            row['result'] = ask(case['question'], generate=generate, docs=docs, rerank=rerank, chunking=chunking)
         except Exception as error:
             row['error'] = f'{type(error).__name__}: {error}'
         report['results'].append(row)
@@ -84,11 +84,12 @@ def main():
     parser.add_argument('--docs', type=Path, default=ROOT / 'docs')
     parser.add_argument('--cases', type=Path, default=ROOT / 'evaluation/qa_cases.json')
     parser.add_argument('--rerank', choices=['none', 'title'], default='none')
+    parser.add_argument('--chunking', choices=['paragraph', 'heading_context'], default='paragraph')
     args = parser.parse_args()
     if args.generate and not os.environ.get('OLLAMA_MODEL'):
         parser.error('Set OLLAMA_MODEL for real generation')
     cases = json.loads(args.cases.read_text(encoding='utf-8'))
-    report = run([c for c in cases if c['split'] == args.split], args.generate, args.output, args.docs, args.rerank)
+    report = run([c for c in cases if c['split'] == args.split], args.generate, args.output, args.docs, args.rerank, args.chunking)
     return int(report['summary']['errors'] > 0)
 
 

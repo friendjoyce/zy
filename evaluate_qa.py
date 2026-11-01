@@ -30,9 +30,9 @@ def summarize(rows):
                     for s in row['case']['relevant']}
         if not expected:
             raise ValueError('Answerable cases require relevant passages')
-        found = {(s['source'], s['paragraph']) for s in row.get('result', {}).get('sources', [])}
-        recalls.append(len(expected & found) / len(expected))
         ordered = [(s['source'], s['paragraph']) for s in row.get('result', {}).get('sources', [])][:3]
+        found = set(ordered)
+        recalls.append(len(expected & found) / len(expected))
         ranks.append(next((1 / i for i, key in enumerate(ordered, 1) if key in expected), 0))
         top_one.append(int(bool(ordered) and ordered[0] in expected))
     completed_negatives = [r for r in negatives if 'result' in r]

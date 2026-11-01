@@ -189,3 +189,7 @@ python compare_chunking.py --split test --output-dir evaluation/chunking
 演示步骤：运行 `app.py`，打开 `http://127.0.0.1:8080` → 选择“多文档演示” → 选择“标题匹配优先”和“标题随正文” → 提问“Orion 当前文档上传上限是多少？旧规则是否仍然适用？” → 点击引用查看原文。配置 `OLLAMA_MODEL` 后可勾选本地模型生成。等待时禁用表单，新查询先清空旧结果；结果显示本次实际配置。
 
 `POST /api/ask` 新增可选字段 `corpus`（intro/multidoc）、`rerank`（none/title）、`chunking`（paragraph/heading_context）。非法值返回 400；知识库只从服务器预设映射中选择，没有开放任意文件路径。HTTP 返回的来源新增 `original_text`，指响应时磁盘上的原段落，不是历史版本快照。接口与页面仍仅用于本机演示。
+
+### 评估指标边界修正
+
+QA 评估的 Recall@3、MRR@3、Hit@1 现在使用一致的前三条候选范围。即使传入超过三条的结果，第四条之后的相关段落也不会计入 Recall@3；新增回归测试覆盖第四条未命中与第三条命中的边界。此前已保存的实验每题最多返回三条，因此该修正不改变这些历史结果，也不表示检索效果提升。

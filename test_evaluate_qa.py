@@ -9,6 +9,21 @@ from qa import answer
 
 
 class QAEvaluationTests(unittest.TestCase):
+    def test_recall_ignores_relevant_results_after_third_position(self):
+        row = {'case': {'category': 'answerable', 'relevant': [
+            {'source': 'right.md', 'paragraph': 1}]},
+            'result': {'sources': [
+                {'source': 'wrong.md', 'paragraph': i} for i in range(1, 4)
+            ] + [{'source': 'right.md', 'paragraph': 1}]}}
+        result = summarize([row])
+        self.assertEqual(result['answerable_recall_at_3'], 0)
+        self.assertEqual(result['answerable_mrr_at_3'], 0)
+        self.assertEqual(result['answerable_hit_at_1'], 0)
+        row['result']['sources'].insert(2, {'source': 'right.md', 'paragraph': 1})
+        result = summarize([row])
+        self.assertEqual(result['answerable_recall_at_3'], 1)
+        self.assertAlmostEqual(result['answerable_mrr_at_3'], 1 / 3)
+
     def test_same_paragraph_number_in_wrong_file_is_not_relevant(self):
         row = {'case': {'category': 'answerable', 'relevant': [
             {'source': 'a.md', 'paragraph': 2}, {'source': 'b.md', 'paragraph': 2}]},

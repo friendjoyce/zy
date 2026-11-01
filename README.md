@@ -210,3 +210,16 @@ python doctor.py --generate --json
 自检检查 Python 版本、Markdown/TXT 文件存在性、UTF-8 可读性及非空内容。默认仅检查检索准备状态，不连接模型；`--generate` 才查询本机 Ollama 的模型列表，检查 `--model` 或 `OLLAMA_MODEL` 指定的模型。未带标签的名称按 `:latest` 匹配。失败退出码为 1，参数错误为 2，全部通过为 0；`--json` 输出结构化报告。
 
 `--model` 只影响这次自检，不设置环境变量；启动网页仍需设置 `OLLAMA_MODEL`。工具不下载模型、不修改配置、不发送文档、不执行推理，也不检查 8080 端口、显存容量或回答质量。纯标题文件仍可能通过非空检查，因此通过不等于每种分块方式都能返回证据。需要验证生成时再运行 `smoke_local.py`。Windows 输出乱码时可使用 `--json`（ASCII 转义，解析后保留中文）。
+
+### QA 题集校验
+
+```powershell
+python evaluate_qa.py --validate-only
+python evaluate_qa.py --validate-only --docs evaluation/multidoc/docs --cases evaluation/multidoc/cases.json --chunking heading_context
+```
+
+仅校验时无需模型、split 或输出路径，也不写报告。正常 `evaluate_qa.py` 运行会先校验完整题集，再选择 dev/test，检查重复编号、去空白并忽略大小写后的重复问题、合法分类与划分、答案标签是否符合分类，以及文件和段落是否存在。重复标签、空段落、越界路径、被当前分块策略排除的标题标签会被拒绝；整数标签仍代表 `intro.md` 的段落。
+
+校验失败发生在模型调用和报告写入前，命令行返回参数错误码 2。Python `run()` 也校验传入的题目列表；如果调用方已筛选 split，它只能检查该子集，跨划分重复需要对完整题集运行 `--validate-only`。
+
+这不是语义标注审核：不能证明问题确实有答案、负例确实无答案，也不能发现编号仍存在但文本含义已改变的情况。语料哈希用于追踪变化，标签仍需人工复核；旧的 `evaluate.py` 检索题集格式不适用此校验器。

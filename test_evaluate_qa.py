@@ -72,7 +72,7 @@ class QAEvaluationTests(unittest.TestCase):
         self.assertIsNone(summarize(rows[2:])['answerable_recall_at_3'])
 
     def test_partial_failure_is_saved_and_following_case_runs(self):
-        cases = [{'id': str(i), 'question': 'q', 'category': 'hard_negative', 'relevant': []}
+        cases = [{'id': str(i), 'question': f'q{i}', 'split': 'test', 'category': 'hard_negative', 'relevant': []}
                  for i in range(2)]
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / 'report.json'

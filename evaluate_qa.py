@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from app import ROOT, ask
+from validate_cases import validate_cases
 
 
 def corpus_manifest(docs):
@@ -52,6 +53,7 @@ def run(cases, generate, output, docs=None, rerank='none', chunking='paragraph')
     if not cases:
         raise ValueError('No cases selected')
     docs = ROOT / 'docs' if docs is None else Path(docs)
+    validate_cases(cases, docs, chunking)
     manifest = corpus_manifest(docs)
     report = {'timestamp': datetime.now(timezone.utc).isoformat(),
               'generate': generate, 'model': os.environ.get('OLLAMA_MODEL') if generate else None,
@@ -78,18 +80,28 @@ def run(cases, generate, output, docs=None, rerank='none', chunking='paragraph')
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--split', choices=['dev', 'test'], required=True)
+    parser.add_argument('--split', choices=['dev', 'test'])
     parser.add_argument('--generate', action='store_true')
-    parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--output', type=Path)
+    parser.add_argument('--validate-only', action='store_true')
     parser.add_argument('--docs', type=Path, default=ROOT / 'docs')
     parser.add_argument('--cases', type=Path, default=ROOT / 'evaluation/qa_cases.json')
     parser.add_argument('--rerank', choices=['none', 'title'], default='none')
     parser.add_argument('--chunking', choices=['paragraph', 'heading_context'], default='paragraph')
     args = parser.parse_args()
-    if args.generate and not os.environ.get('OLLAMA_MODEL'):
+    if not args.validate_only and (args.split is None or args.output is None):
+        parser.error('--split and --output are required for evaluation')
+    if args.generate and not args.validate_only and not os.environ.get('OLLAMA_MODEL'):
         parser.error('Set OLLAMA_MODEL for real generation')
-    cases = json.loads(args.cases.read_text(encoding='utf-8'))
-    report = run([c for c in cases if c['split'] == args.split], args.generate, args.output, args.docs, args.rerank, args.chunking)
+    try:
+        cases = json.loads(args.cases.read_text(encoding='utf-8-sig'))
+        validate_cases(cases, args.docs, args.chunking)
+        if args.validate_only:
+            print(f'Validated {len(cases)} cases across all splits; semantic correctness not checked.')
+            return 0
+        report = run([c for c in cases if c['split'] == args.split], args.generate, args.output, args.docs, args.rerank, args.chunking)
+    except (ValueError, OSError) as error:
+        parser.error(str(error))
     return int(report['summary']['errors'] > 0)
 
 

@@ -4,6 +4,8 @@
 
 准备展示项目可阅读 [面试演示与讲解材料](INTERVIEW.md)：包含五分钟操作流程、代码定位、实验数字的适用范围、常见追问和自主练习清单。
 
+自动检查见 [GitHub Actions](https://github.com/friendjoyce/zy/actions/workflows/checks.yml)。本地可运行 `python check.py` 执行相同的无模型检查。
+
 ## 运行
 
 演示前可运行 `python doctor.py` 检查默认知识库；生成模式用 `python doctor.py --generate --model qwen3:4b`。详细说明见下方“启动自检”。
@@ -223,3 +225,11 @@ python evaluate_qa.py --validate-only --docs evaluation/multidoc/docs --cases ev
 校验失败发生在模型调用和报告写入前，命令行返回参数错误码 2。Python `run()` 也校验传入的题目列表；如果调用方已筛选 split，它只能检查该子集，跨划分重复需要对完整题集运行 `--validate-only`。
 
 这不是语义标注审核：不能证明问题确实有答案、负例确实无答案，也不能发现编号仍存在但文本含义已改变的情况。语料哈希用于追踪变化，标签仍需人工复核；旧的 `evaluate.py` 检索题集格式不适用此校验器。
+
+### 持续集成检查
+
+推送 main、向 main 提交 PR 或手动触发时，`.github/workflows/checks.yml` 会在 Ubuntu/Python 3.10、Ubuntu/Python 3.13 和 Windows/Python 3.13 上运行 `python check.py`。检查包含 unittest、两个知识库的只读自检，以及两套 QA 题集在两种分块方式下的完整校验。子命令失败后立即返回非零状态，不会被后续成功命令掩盖；本地与云端使用同一入口。
+
+流水线不安装或下载 Ollama 模型，不使用 API 密钥，不运行真实推理或浏览器交互。绿色状态只代表上述检查通过，不代表答案质量、模型可用性或生产安全。正式生成验证仍需本机运行。工作流仅有仓库内容读取权限；未设置分支保护，因此失败不会自动撤销已经推送的提交，也不保证阻止合并。
+
+官方 Action 用完整提交 SHA 固定版本，配置参考 [checkout](https://github.com/actions/checkout) 与 [setup-python](https://github.com/actions/setup-python) 的文档。后续升级需核对新版本后更新 SHA。

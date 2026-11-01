@@ -4,11 +4,43 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from evaluate_qa import ROOT, run, summarize
+from evaluate_qa import ROOT, run, summarize, corpus_manifest
 from qa import answer
 
 
 class QAEvaluationTests(unittest.TestCase):
+    def test_same_paragraph_number_in_wrong_file_is_not_relevant(self):
+        row = {'case': {'category': 'answerable', 'relevant': [
+            {'source': 'a.md', 'paragraph': 2}, {'source': 'b.md', 'paragraph': 2}]},
+            'result': {'sources': [{'source': 'a.md', 'paragraph': 2},
+                                   {'source': 'wrong.md', 'paragraph': 2}]}}
+        self.assertEqual(summarize([row])['answerable_recall_at_3'], 0.5)
+
+    def test_manifest_tracks_nested_documents_and_changes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'nested').mkdir()
+            path = root / 'nested/a.TXT'
+            path.write_text('one', encoding='utf-8')
+            (root / 'ignored.json').write_text('{}', encoding='utf-8')
+            first = corpus_manifest(root)
+            self.assertEqual(list(first), ['nested/a.TXT'])
+            path.write_text('two', encoding='utf-8')
+            self.assertNotEqual(first, corpus_manifest(root))
+            path.unlink()
+            self.assertEqual(corpus_manifest(root), {})
+
+    def test_multidoc_labels_point_to_existing_passages(self):
+        from search import cached_passages
+        root = ROOT / 'evaluation/multidoc'
+        cases = json.loads((root / 'cases.json').read_text(encoding='utf-8'))
+        for case in cases:
+            for label in case['relevant']:
+                path = root / 'docs' / label['source']
+                stat = path.stat()
+                passages = dict((n, text) for n, text, _ in cached_passages(str(path), stat.st_mtime_ns, stat.st_size))
+                self.assertTrue(passages[label['paragraph']])
+
     def test_negatives_do_not_inflate_answerable_recall(self):
         rows = [
             {'case': {'category': 'answerable', 'relevant': [2]},

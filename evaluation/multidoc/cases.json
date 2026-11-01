@@ -1,0 +1,8 @@
+[
+  {"id":"multi-dev-01","split":"dev","category":"answerable","question":"Lyra 文档上传上限是多少？","relevant":[{"source":"lyra.md","paragraph":2}],"expected":"50 MB，不应使用 Orion 的规则。"},
+  {"id":"multi-dev-02","split":"dev","category":"hard_negative","question":"Orion 文档响应耗时是多少毫秒？","relevant":[],"expected":"资料没有耗时数值，应说明证据不足。"},
+  {"id":"multi-test-01","split":"test","category":"answerable","question":"Orion 当前文档上传上限是多少？旧规则是否仍然适用？","relevant":[{"source":"orion_current.md","paragraph":2},{"source":"orion_archived.md","paragraph":2}],"expected":"当前 20 MB，旧的 10 MB 已被替代；引用对应来源。"},
+  {"id":"multi-test-02","split":"test","category":"answerable","question":"Orion 文档支持 PDF 吗？","relevant":[{"source":"orion_current.md","paragraph":3}],"expected":"不支持；支持 Markdown 和 TXT。"},
+  {"id":"multi-test-03","split":"test","category":"answerable","question":"Vega 文档保留期限是多少天？记录是否一致？","relevant":[{"source":"vega_a.md","paragraph":2},{"source":"vega_b.md","paragraph":2}],"expected":"记录 A 为 7 天，B 为 30 天；资料冲突且无法判定优先级，不可任选一个作为最终规则。"},
+  {"id":"multi-test-04","split":"test","category":"hard_negative","question":"Orion 文档系统最多支持多少并发用户？","relevant":[],"expected":"资料未提供并发用户数，应说明证据不足。"}
+]

@@ -131,3 +131,21 @@ python evaluate_qa.py --split test --generate --output evaluation/qa_test_result
 本轮固定现有提示词后运行测试集，不根据测试题调参；后续可用 dev 调整，再重新报告 test 结果。测试题已经公开，若持续据此修改实现，应另建未用于调参的测试集。独立人工复核和更丰富的文档仍在待办中。
 
 本轮实际结果：测试集六题无运行错误，三道可回答题 Recall@3 = 1.0；两道困难负例都召回了无关段落，但模型回答“insufficient evidence”；无匹配题未调用模型。见 `evaluation/qa_test_results.json` 和逐题检查 `evaluation/qa_review.md`。检查由开发助手完成，不是独立人工评测；这些小样本结果不可包装为通用准确率或业务提升。
+
+### 多文档与冲突证据实验
+
+`evaluation/multidoc/docs` 包含五份 AI 编写的虚构资料，分别模拟 Orion 新旧规则、相似产品 Lyra、相互矛盾且没有优先级的 Vega 记录。所有数值都是测试设定，不代表真实产品或实验性能。实验语料独立保存，网页仍默认查询 `docs`，原始基准的语料不会因此改变。
+
+```powershell
+python evaluate_qa.py --docs evaluation/multidoc/docs --cases evaluation/multidoc/cases.json --split dev --output evaluation/multidoc/dev_retrieval.json
+$env:OLLAMA_MODEL="qwen3:4b"
+python evaluate_qa.py --docs evaluation/multidoc/docs --cases evaluation/multidoc/cases.json --split test --generate --output evaluation/multidoc/test_results.json
+```
+
+Python 调用也可使用 `ask(question, generate=True, docs=Path("evaluation/multidoc/docs"))`；文档路径只由本地代码或命令行指定，不向网页请求开放。
+
+多文档标签使用 `{"source":"文件名", "paragraph":2}`，避免不同文件中的同号段落被误计为正确命中。旧的整数标签仍解释为 `intro.md` 的段落。冲突题需要召回两条证据，理想回答应引用双方、说明冲突，不能在缺乏优先级时任意选择。当前仅观察模型行为，没有添加自动冲突检测器。
+
+新报告的 `corpus_manifest` 记录所有 Markdown/TXT 文件的路径和内容 SHA-256；`corpus_sha256` 改为该清单排序 JSON 的哈希，并有 `corpus_hash_format` 标识。此前没有该格式字段的报告只记录 `intro.md` 内容哈希，两种格式不可直接比较。
+
+真实运行与逐题检查见 `evaluation/multidoc/test_results.json`、`evaluation/multidoc/REVIEW.md`：四题无运行错误，模型区分新旧规则、列出冲突并在缺少并发数据时拒答。但 Orion 问题的首条检索结果是无关的 Lyra 文档；Recall@3 满分不能掩盖这个排名问题。该实验只有少量 AI 合成题，尚无独立人工复核。

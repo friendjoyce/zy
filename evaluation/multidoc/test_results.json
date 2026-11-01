@@ -1,0 +1,222 @@
+{
+  "timestamp": "2026-11-01T06:59:07.866165+00:00",
+  "generate": true,
+  "model": "qwen3:4b",
+  "corpus_manifest": {
+    "lyra.md": "76a4aac4920fd5da894254d896413997a2332b55f401577f8f39375ef85401ea",
+    "orion_archived.md": "7151cb48281d5f58daae728f630dae6753cf9217fc78ddf85ba284ffaab233d6",
+    "orion_current.md": "7d0857dc4bf8ca0250bb9f222f99a7ce4adbab50ee62e5152c0a34c0e6b3c849",
+    "vega_a.md": "75fe1dbdf92c960616e80f609f6017529645c4e721b8397e2e52ee931f7a82df",
+    "vega_b.md": "9f371656309dd90fb4197c3551aa0ba8852e4bec90d8f1217dd4ee097ec3117c"
+  },
+  "corpus_hash_format": "sorted-json-path-to-sha256-v1",
+  "corpus_sha256": "95df2e43b267de8d047d5b13fa68c5679a2ad065660a3ab9f312e3e69e1228f8",
+  "cases_sha256": "1872a503e3cec8fd8e5ff5da51bfbb0ad194ed3a31b2342f7ff4cc75534ddf9e",
+  "results": [
+    {
+      "case": {
+        "id": "multi-test-01",
+        "split": "test",
+        "category": "answerable",
+        "question": "Orion 当前文档上传上限是多少？旧规则是否仍然适用？",
+        "relevant": [
+          {
+            "source": "orion_current.md",
+            "paragraph": 2
+          },
+          {
+            "source": "orion_archived.md",
+            "paragraph": 2
+          }
+        ],
+        "expected": "当前 20 MB，旧的 10 MB 已被替代；引用对应来源。"
+      },
+      "result": {
+        "mode": "generated",
+        "answer": "Orion's current document upload limit is 20 MB per file (effective from October 1, 2026). The old rule (10 MB per file, effective from September 1, 2026) no longer applies. [2], [3]",
+        "sources": [
+          {
+            "id": 1,
+            "source": "lyra.md",
+            "paragraph": 2,
+            "text": "Lyra 文档上传上限为每个文件 50 MB。Lyra 是另一个虚构产品，不能用此规则回答 Orion 的问题。",
+            "score": 0.32328635593932165
+          },
+          {
+            "id": 2,
+            "source": "orion_current.md",
+            "paragraph": 2,
+            "text": "Orion 文档上传上限：2026-10-01 起生效的当前规则为每个文件 20 MB，替代 2026-09-01 的旧规则。仅用于测试，不对应真实产品。",
+            "score": 0.2975620135474149
+          },
+          {
+            "id": 3,
+            "source": "orion_archived.md",
+            "paragraph": 2,
+            "text": "Orion 文档上传上限：2026-09-01 的旧规则为每个文件 10 MB；此规则已归档，由 2026-10-01 起生效的新规则替代。",
+            "score": 0.2667451677616064
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 53137.8
+      }
+    },
+    {
+      "case": {
+        "id": "multi-test-02",
+        "split": "test",
+        "category": "answerable",
+        "question": "Orion 文档支持 PDF 吗？",
+        "relevant": [
+          {
+            "source": "orion_current.md",
+            "paragraph": 3
+          }
+        ],
+        "expected": "不支持；支持 Markdown 和 TXT。"
+      },
+      "result": {
+        "mode": "generated",
+        "answer": "Orion 文档不支持 PDF。  \n依据证据 [1]：Orion 文档支持 Markdown 和 TXT；不支持 PDF。  \n\n**Citation**: [1]",
+        "sources": [
+          {
+            "id": 1,
+            "source": "orion_current.md",
+            "paragraph": 3,
+            "text": "Orion 文档支持 Markdown 和 TXT；不支持 PDF。当前规则没有提供并发用户数或响应耗时。",
+            "score": 0.4816617837613814
+          },
+          {
+            "id": 2,
+            "source": "orion_archived.md",
+            "paragraph": 2,
+            "text": "Orion 文档上传上限：2026-09-01 的旧规则为每个文件 10 MB；此规则已归档，由 2026-10-01 起生效的新规则替代。",
+            "score": 0.11236107719768024
+          },
+          {
+            "id": 3,
+            "source": "lyra.md",
+            "paragraph": 2,
+            "text": "Lyra 文档上传上限为每个文件 50 MB。Lyra 是另一个虚构产品，不能用此规则回答 Orion 的问题。",
+            "score": 0.10141639278773965
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 4386.76
+      }
+    },
+    {
+      "case": {
+        "id": "multi-test-03",
+        "split": "test",
+        "category": "answerable",
+        "question": "Vega 文档保留期限是多少天？记录是否一致？",
+        "relevant": [
+          {
+            "source": "vega_a.md",
+            "paragraph": 2
+          },
+          {
+            "source": "vega_b.md",
+            "paragraph": 2
+          }
+        ],
+        "expected": "记录 A 为 7 天，B 为 30 天；资料冲突且无法判定优先级，不可任选一个作为最终规则。"
+      },
+      "result": {
+        "mode": "generated",
+        "answer": "Vega 文档保留期限存在不一致，记录 A 为 7 天，记录 B 为 30 天。[1][2]",
+        "sources": [
+          {
+            "id": 1,
+            "source": "vega_a.md",
+            "paragraph": 2,
+            "text": "Vega 文档保留期限：记录 A 写为 7 天。没有生效日期，也没有声明其优先级。",
+            "score": 0.31747829975332764
+          },
+          {
+            "id": 2,
+            "source": "vega_b.md",
+            "paragraph": 2,
+            "text": "Vega 文档保留期限：记录 B 写为 30 天。没有生效日期，也没有声明其优先级。",
+            "score": 0.31747829975332764
+          },
+          {
+            "id": 3,
+            "source": "lyra.md",
+            "paragraph": 2,
+            "text": "Lyra 文档上传上限为每个文件 50 MB。Lyra 是另一个虚构产品，不能用此规则回答 Orion 的问题。",
+            "score": 0.20566878052144066
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 6191.36
+      }
+    },
+    {
+      "case": {
+        "id": "multi-test-04",
+        "split": "test",
+        "category": "hard_negative",
+        "question": "Orion 文档系统最多支持多少并发用户？",
+        "relevant": [],
+        "expected": "资料未提供并发用户数，应说明证据不足。"
+      },
+      "result": {
+        "mode": "generated",
+        "answer": "Insufficient evidence. The provided evidence states that the current rules do not specify concurrent user numbers for Orion. [1]",
+        "sources": [
+          {
+            "id": 1,
+            "source": "orion_current.md",
+            "paragraph": 3,
+            "text": "Orion 文档支持 Markdown 和 TXT；不支持 PDF。当前规则没有提供并发用户数或响应耗时。",
+            "score": 0.37113536069023473
+          },
+          {
+            "id": 2,
+            "source": "lyra.md",
+            "paragraph": 2,
+            "text": "Lyra 文档上传上限为每个文件 50 MB。Lyra 是另一个虚构产品，不能用此规则回答 Orion 的问题。",
+            "score": 0.07983212406254267
+          },
+          {
+            "id": 3,
+            "source": "orion_current.md",
+            "paragraph": 2,
+            "text": "Orion 文档上传上限：2026-10-01 起生效的当前规则为每个文件 20 MB，替代 2026-09-01 的旧规则。仅用于测试，不对应真实产品。",
+            "score": 0.07003753228350412
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 16778.64
+      }
+    }
+  ],
+  "summary": {
+    "cases": 4,
+    "errors": 0,
+    "answerable_cases": 3,
+    "answerable_recall_at_3": 1.0,
+    "completed_negative_cases": 1,
+    "negative_cases_with_hits": 1,
+    "semantic_quality_evaluated": false
+  },
+  "complete": true
+}

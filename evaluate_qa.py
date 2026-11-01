@@ -9,15 +9,26 @@ from pathlib import Path
 from app import ROOT, ask
 
 
+def corpus_manifest(docs):
+    docs = Path(docs)
+    if not docs.is_dir():
+        raise ValueError('Document directory must exist')
+    return {p.relative_to(docs).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+            for p in sorted(docs.rglob('*'))
+            if p.is_file() and p.suffix.lower() in {'.md', '.txt'}}
+
+
 def summarize(rows):
     positives = [r for r in rows if r['case']['category'] == 'answerable']
     negatives = [r for r in rows if r['case']['category'] != 'answerable']
     # Operational errors count as misses in the all-case retrieval denominator.
     recalls = []
     for row in positives:
-        expected = set(row['case']['relevant'])
-        found = {s['paragraph'] for s in row.get('result', {}).get('sources', [])
-                 if s['source'] == 'intro.md'}
+        expected = {(s['source'], s['paragraph']) if isinstance(s, dict) else ('intro.md', s)
+                    for s in row['case']['relevant']}
+        if not expected:
+            raise ValueError('Answerable cases require relevant passages')
+        found = {(s['source'], s['paragraph']) for s in row.get('result', {}).get('sources', [])}
         recalls.append(len(expected & found) / len(expected))
     completed_negatives = [r for r in negatives if 'result' in r]
     return {
@@ -30,19 +41,23 @@ def summarize(rows):
     }
 
 
-def run(cases, generate, output):
+def run(cases, generate, output, docs=None):
     if not cases:
         raise ValueError('No cases selected')
+    docs = ROOT / 'docs' if docs is None else Path(docs)
+    manifest = corpus_manifest(docs)
     report = {'timestamp': datetime.now(timezone.utc).isoformat(),
               'generate': generate, 'model': os.environ.get('OLLAMA_MODEL') if generate else None,
-              'corpus_sha256': hashlib.sha256((ROOT / 'docs/intro.md').read_bytes()).hexdigest(),
+              'corpus_manifest': manifest,
+              'corpus_hash_format': 'sorted-json-path-to-sha256-v1',
+              'corpus_sha256': hashlib.sha256(json.dumps(manifest, sort_keys=True).encode()).hexdigest(),
               'cases_sha256': hashlib.sha256(json.dumps(cases, sort_keys=True, ensure_ascii=False).encode()).hexdigest(),
               'results': []}
     output.parent.mkdir(parents=True, exist_ok=True)
     for case in cases:
         row = {'case': case}
         try:
-            row['result'] = ask(case['question'], generate=generate)
+            row['result'] = ask(case['question'], generate=generate, docs=docs)
         except Exception as error:
             row['error'] = f'{type(error).__name__}: {error}'
         report['results'].append(row)
@@ -58,11 +73,13 @@ def main():
     parser.add_argument('--split', choices=['dev', 'test'], required=True)
     parser.add_argument('--generate', action='store_true')
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--docs', type=Path, default=ROOT / 'docs')
+    parser.add_argument('--cases', type=Path, default=ROOT / 'evaluation/qa_cases.json')
     args = parser.parse_args()
     if args.generate and not os.environ.get('OLLAMA_MODEL'):
         parser.error('Set OLLAMA_MODEL for real generation')
-    cases = json.loads((ROOT / 'evaluation/qa_cases.json').read_text(encoding='utf-8'))
-    report = run([c for c in cases if c['split'] == args.split], args.generate, args.output)
+    cases = json.loads(args.cases.read_text(encoding='utf-8'))
+    report = run([c for c in cases if c['split'] == args.split], args.generate, args.output, args.docs)
     return int(report['summary']['errors'] > 0)
 
 

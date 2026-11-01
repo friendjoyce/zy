@@ -1,3 +1,48 @@
-<!doctype html><html lang="zh"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>ZY · 文档问答</title><style>body{max-width:850px;margin:60px auto;padding:20px;font:17px system-ui;background:#f5f7fb;color:#172238}textarea{width:100%;box-sizing:border-box;padding:15px}button{padding:12px 28px;background:#234fbd;color:white;border:0;border-radius:8px;margin:16px}pre{white-space:pre-wrap;background:white;padding:24px;border-radius:12px}summary{cursor:pointer}footer{color:#667;font-size:14px}</style><h1>ZY 文档问答</h1><p>检索知识库，查看回答依据。默认仅摘录原文。</p><form id="form"><textarea id="question" required maxlength="2000" rows="4" placeholder="例如：RAG 是什么？"></textarea><label><input id="generate" type="checkbox">使用本地模型生成（需要配置 Ollama）</label><button id="submit">提问</button></form><p id="status" role="status"></p><pre id="answer"></pre><section id="sources"></section><footer>引用编号检查不代表事实核验。模型可能出错，请核对原文。</footer><script>
-form.onsubmit=async e=>{e.preventDefault();document.getElementById("submit").disabled=true;document.getElementById('status').textContent='正在检索…';document.getElementById('sources').replaceChildren();try{let r=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:question.value,generate:generate.checked})});let d=await r.json();if(!r.ok)throw Error(d.error);document.getElementById('answer').textContent=d.answer;document.getElementById('status').textContent=d.mode+' · '+d.latency_ms+' ms · 未知引用：'+d.citation_check.unknown_ids.join(',');for(let s of d.sources){let detail=document.createElement('details'),title=document.createElement('summary'),text=document.createElement('pre');title.textContent=`[${s.id}] ${s.source} · 段落 ${s.paragraph} · ${s.score.toFixed(3)}`;text.textContent=s.text;detail.append(title,text);sources.append(detail)}}catch(e){document.getElementById('status').textContent=e.message}finally{document.getElementById("submit").disabled=false}};
+<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>ZY · 文档问答</title>
+<style>
+body{max-width:900px;margin:40px auto;padding:20px;font:17px system-ui;background:#f5f7fb;color:#172238}textarea{width:100%;box-sizing:border-box;padding:15px;font:inherit}fieldset{border:0;padding:0;display:flex;flex-wrap:wrap;gap:16px;margin:20px 0}label{display:block}select{display:block;padding:8px;margin-top:6px;font:inherit}button{cursor:pointer;padding:12px 24px;background:#234fbd;color:white;border:0;border-radius:8px}button:disabled{opacity:.5}pre,.answer{white-space:pre-wrap;overflow-wrap:anywhere;background:white;padding:20px;border-radius:12px;font:inherit}summary{cursor:pointer;padding:12px}details{background:white;border:1px solid #dbe1ed;border-radius:8px;margin:12px 0}details:focus{outline:3px solid #234fbd}footer,.hint{color:#526078;font-size:14px}.citation{padding:2px 6px;margin:0 2px;font:inherit}.warning{color:#9a3218}.actions{display:flex;gap:20px;align-items:center;flex-wrap:wrap}#answer:empty{display:none}
+</style>
+<h1>ZY 文档问答</h1><p>比较检索方案，点击回答中的引用核对证据。</p>
+<form id="form"><label for="question">你的问题</label><textarea id="question" required maxlength="2000" rows="3" placeholder="例如：RAG 是什么？"></textarea>
+<fieldset><legend>检索设置</legend>
+<label>知识库<select id="corpus"><option value="intro">基础知识</option><option value="multidoc">多文档演示（虚构资料）</option></select></label>
+<label>排序方式<select id="rerank"><option value="none">原始相似度</option><option value="title">标题匹配优先（实验）</option></select></label>
+<label>分块方式<select id="chunking"><option value="paragraph">按段落</option><option value="heading_context">标题随正文（实验）</option></select></label>
+</fieldset><p class="hint" id="example">基础知识示例：RAG 的出处能保证答案正确吗？</p>
+<div class="actions"><label><input id="generate" type="checkbox">使用本地模型生成</label><button id="submit" type="submit">提问</button></div></form>
+<p id="status" role="status" aria-live="polite"></p><p id="used" class="hint"></p><div id="answer" class="answer"></div><section id="sources" aria-label="回答证据"></section>
+<footer>模型生成需要配置 Ollama。引用编号有效不代表事实正确。演示库数值为虚构设定。</footer>
+<script>
+'use strict';
+const el=id=>document.getElementById(id);
+const labels={intro:'基础知识',multidoc:'虚构多文档',none:'原始相似度',title:'标题优先',paragraph:'按段落',heading_context:'标题随正文'};
+el('corpus').onchange=()=>{el('example').textContent=el('corpus').value==='multidoc'?'演示问题：Orion 当前文档上传上限是多少？旧规则是否仍然适用？':'基础知识示例：RAG 的出处能保证答案正确吗？'};
+function renderAnswer(text,ids){
+ const target=el('answer');let cursor=0;
+ for(const match of text.matchAll(/\[(\d+)\]/g)){
+  target.append(document.createTextNode(text.slice(cursor,match.index)));const id=Number(match[1]);
+  if(ids.has(id)){const button=document.createElement('button');button.type='button';button.className='citation';button.textContent=match[0];button.setAttribute('aria-label',`查看引用 ${id}`);button.onclick=()=>{const detail=el(`source-${id}`);detail.open=true;detail.scrollIntoView({behavior:'smooth',block:'center'});detail.focus({preventScroll:true})};target.append(button)}
+  else{const span=document.createElement('span');span.className='warning';span.textContent=match[0]+'（无对应证据）';target.append(span)}
+  cursor=match.index+match[0].length;
+ }
+ target.append(document.createTextNode(text.slice(cursor)));
+}
+el('form').onsubmit=async event=>{
+ event.preventDefault();const payload={question:el('question').value,generate:el('generate').checked,corpus:el('corpus').value,rerank:el('rerank').value,chunking:el('chunking').value};
+ const controls=[...el('form').querySelectorAll('input,select,textarea,button')];controls.forEach(c=>c.disabled=true);
+ el('answer').replaceChildren();el('sources').replaceChildren();el('used').textContent='';el('status').textContent=payload.generate?'正在检索并等待本地模型，可能需要一两分钟…':'正在检索…';
+ try{
+  const response=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await response.json();if(!response.ok)throw Error(data.error||'请求失败');
+  el('used').textContent=`本次配置：${labels[data.settings.corpus]} · ${labels[data.settings.rerank]} · ${labels[data.settings.chunking]}`;
+  const modes={generated:'模型回答',extractive:'证据摘录',no_evidence:'未找到匹配证据'};el('status').textContent=`${modes[data.mode]||data.mode} · ${(data.latency_ms/1000).toFixed(2)} 秒 · ${data.sources.length} 条证据`;
+  for(const source of data.sources){
+   const detail=document.createElement('details');detail.id=`source-${source.id}`;detail.tabIndex=-1;const title=document.createElement('summary');title.textContent=`[${source.id}] ${source.source} · 原文段落 ${source.paragraph} · 相似度 ${source.score.toFixed(3)}`;
+   const caption=document.createElement('p');caption.className='hint';caption.textContent='检索上下文（可能含继承标题或截断）';const context=document.createElement('pre');context.textContent=source.text;
+   const originalLabel=document.createElement('p');originalLabel.className='hint';originalLabel.textContent='原文件中的对应段落';const original=document.createElement('pre');original.textContent=source.original_text;
+   detail.append(title,caption,context,originalLabel,original);el('sources').append(detail);
+  }
+  renderAnswer(data.answer,new Set(data.sources.map(s=>s.id)));
+ }catch(error){el('status').textContent='请求失败：'+error.message}finally{controls.forEach(c=>c.disabled=false)}
+};
 </script></html>

@@ -7,8 +7,33 @@ from pathlib import Path
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.request import Request, urlopen
 from qa import answer
+from search import cached_passages
 
 ROOT = Path(__file__).parent
+CORPORA = {'intro': ROOT / 'docs', 'multidoc': ROOT / 'evaluation/multidoc/docs'}
+
+
+def ask_request(data):
+    if not isinstance(data, dict) or not isinstance(data.get('generate', False), bool):
+        raise ValueError('Expected JSON object and boolean generate')
+    options = {}
+    for key, choices, default in [('corpus', CORPORA, 'intro'),
+                                  ('rerank', ('none', 'title'), 'none'),
+                                  ('chunking', ('paragraph', 'heading_context'), 'paragraph')]:
+        value = data.get(key, default)
+        if not isinstance(value, str) or value not in choices:
+            raise ValueError(f'Invalid {key}')
+        options[key] = value
+    docs = CORPORA[options['corpus']]
+    report = ask(data.get('question'), data.get('generate', False), docs=docs,
+                 rerank=options['rerank'], chunking=options['chunking'])
+    for source in report['sources']:
+        path = docs / source['source']
+        stat = path.stat()
+        passages = cached_passages(str(path.resolve()), stat.st_mtime_ns, stat.st_size)
+        source['original_text'] = next(text for number, text, _ in passages if number == source['paragraph'])
+    report['settings'] = options
+    return report
 
 
 def ask(question, generate=False, *, docs=None, rerank='none', chunking='paragraph'):
@@ -69,9 +94,7 @@ class Handler(BaseHTTPRequestHandler):
             if not 0 < size <= 16000:
                 raise ValueError('Invalid request size')
             data = json.loads(self.rfile.read(size))
-            if not isinstance(data, dict) or not isinstance(data.get('generate', False), bool):
-                raise ValueError('Expected JSON object and boolean generate')
-            report = ask(data.get('question'), data.get('generate', False))
+            report = ask_request(data)
             self.send_json(200, report)
         except (ValueError, UnicodeError) as error:
             self.send_json(400, {'error': str(error)})

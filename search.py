@@ -4,10 +4,19 @@ import re
 from collections import Counter
 from math import log, sqrt
 from pathlib import Path
+from functools import lru_cache
 
 
 def tokens(text):
     return set(re.findall(r'[a-z0-9_]+|[\u4e00-\u9fff]', text.lower()))
+
+
+@lru_cache(maxsize=128)
+def cached_passages(path, modified, size):
+    """Cache immutable parsed passages; metadata changes invalidate the entry."""
+    text = Path(path).read_text(encoding='utf-8-sig')
+    return tuple((n, part.strip(), frozenset(tokens(part)))
+                 for n, part in enumerate(re.split(r'\n\s*\n', text), 1))
 
 
 def search(root, query, limit=3, min_score=0.0, method='jaccard'):
@@ -23,9 +32,9 @@ def search(root, query, limit=3, min_score=0.0, method='jaccard'):
     documents = []
     for path in sorted(root.rglob('*')):
         if path.is_file() and path.suffix.lower() in {'.md', '.txt'}:
-            for number, text in enumerate(re.split(r'\n\s*\n', path.read_text(encoding='utf-8')), 1):
-                words = tokens(text)
-                documents.append((path, number, text.strip(), words))
+            stat = path.stat()
+            for number, text, words in cached_passages(str(path.resolve()), stat.st_mtime_ns, stat.st_size):
+                documents.append((path, number, text, words))
     document_frequency = Counter(token for _, _, _, words in documents for token in set(words))
     total_documents = len(documents)
     hits = []

@@ -13,7 +13,7 @@ class TfidfTests(unittest.TestCase):
 
     def test_invalid_method(self):
         with self.assertRaises(ValueError):
-            search(".", "query", method="bm25")
+            search(".", "query", method="unsupported")
 
 class TfidfRegressionTests(unittest.TestCase):
     def test_single_document_has_positive_score(self):

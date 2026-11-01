@@ -1,0 +1,694 @@
+{
+  "timestamp": "2026-11-01T16:22:55.045185+00:00",
+  "split": "test",
+  "configuration": {
+    "k": 3,
+    "min_score": 0,
+    "rerank": "none",
+    "chunking": "paragraph",
+    "bm25_k1": 1.2,
+    "bm25_b": 0.75
+  },
+  "runs": [
+    {
+      "suite": "intro",
+      "method": "tfidf",
+      "corpus_manifest": {
+        "intro.md": "7a5eae4003aa91d9e18cb804551a87f3b65e7ad9f39c16e1358067d6d316b2bf"
+      },
+      "cases_sha256": "e1c06b5257602343c145f04a97dc0bfe4450bb17feca22b2fc6a471dcd9c68ae",
+      "summary": {
+        "cases": 6,
+        "errors": 0,
+        "answerable_cases": 3,
+        "answerable_recall_at_3": 1.0,
+        "answerable_mrr_at_3": 1.0,
+        "answerable_hit_at_1": 1.0,
+        "completed_negative_cases": 3,
+        "negative_cases_with_hits": 2,
+        "semantic_quality_evaluated": false
+      },
+      "results": [
+        {
+          "case": {
+            "id": "test-01",
+            "split": "test",
+            "category": "answerable",
+            "question": "RAG 提供出处是否就能确保答案正确？",
+            "relevant": [
+              3
+            ],
+            "expected": "不能；出处帮助核对但不保证正确。"
+          },
+          "result": {
+            "sources": [
+              {
+                "score": 0.36074732617817357,
+                "source": "intro.md",
+                "paragraph": 3,
+                "text": "RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。"
+              }
+            ]
+          }
+        },
+        {
+          "case": {
+            "id": "test-02",
+            "split": "test",
+            "category": "answerable",
+            "question": "How are code changes tracked in Git?",
+            "relevant": [
+              4
+            ],
+            "expected": "As commits."
+          },
+          "result": {
+            "sources": [
+              {
+                "score": 0.37946636129383976,
+                "source": "intro.md",
+                "paragraph": 4,
+                "text": "Git records code changes as commits."
+              }
+            ]
+          }
+        },
+        {
+          "case": {
+            "id": "test-03",
+            "split": "test",
+            "category": "answerable",
+            "question": "文本变成数值表示后，如何找到相近的材料？",
+            "relevant": [
+              2
+            ],
+            "expected": "通过向量相似度查找相关文档。"
+          },
+          "result": {
+            "sources": [
+              {
+                "score": 0.23727755139531642,
+                "source": "intro.md",
+                "paragraph": 2,
+                "text": "向量检索将文本表示为向量，通过相似度查找相关文档。"
+              },
+              {
+                "score": 0.16904871028704865,
+                "source": "intro.md",
+                "paragraph": 1,
+                "text": "# 示例资料"
+              },
+              {
+                "score": 0.07551538362782678,
+                "source": "intro.md",
+                "paragraph": 3,
+                "text": "RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。"
+              }
+            ]
+          }
+        },
+        {
+          "case": {
+            "id": "test-04",
+            "split": "test",
+            "category": "hard_negative",
+            "question": "RAG 的检索阶段在这台电脑上耗时多少毫秒？",
+            "relevant": [],
+            "expected": "证据没有耗时测量，不能给出毫秒数。"
+          },
+          "result": {
+            "sources": [
+              {
+                "score": 0.06942915437162596,
+                "source": "intro.md",
+                "paragraph": 3,
+                "text": "RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。"
+              },
+              {
+                "score": 0.044402002082233896,
+                "source": "intro.md",
+                "paragraph": 2,
+                "text": "向量检索将文本表示为向量，通过相似度查找相关文档。"
+              }
+            ]
+          }
+        },
+        {
+          "case": {
+            "id": "test-05",
+            "split": "test",
+            "category": "hard_negative",
+            "question": "Git 请给出删除远程仓库的完整命令。",
+            "relevant": [],
+            "expected": "证据只有 Git 记录提交的介绍，不能据此提供删除命令。"
+          },
+          "result": {
+            "sources": [
+              {
+                "score": 0.08124260272198304,
+                "source": "intro.md",
+                "paragraph": 4,
+                "text": "Git records code changes as commits."
+              },
+              {
+                "score": 0.06753669955465469,
+                "source": "intro.md",
+                "paragraph": 3,
+                "text": "RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。"
+              }
+            ]
+          }
+        },
+        {
+          "case": {
+            "id": "test-06",
+            "split": "test",
+            "category": "no_match",
+            "question": "xxxxxxxx",
+            "relevant": [],
+            "expected": "无匹配，不调用模型。"
+          },
+          "result": {
+            "sources": []
+          }
+        }
+      ]
+    },
+    {
+      "suite": "intro",
+      "method": "bm25",
+      "corpus_manifest": {
+        "intro.md": "7a5eae4003aa91d9e18cb804551a87f3b65e7ad9f39c16e1358067d6d316b2bf"
+      },
+      "cases_sha256": "e1c06b5257602343c145f04a97dc0bfe4450bb17feca22b2fc6a471dcd9c68ae",
+      "summary": {
+        "cases": 6,
+        "errors": 0,
+        "answerable_cases": 3,
+        "answerable_recall_at_3": 1.0,
+        "answerable_mrr_at_3": 1.0,
+        "answerable_hit_at_1": 1.0,
+        "completed_negative_cases": 3,
+        "negative_cases_with_hits": 2,
+        "semantic_quality_evaluated": false
+      },
+      "results": [
+        {
+          "case": {
+            "id": "test-01",
+            "split": "test",
+            "category": "answerable",
+            "question": "RAG 提供出处是否就能确保答案正确？",
+            "relevant": [
+              3
+            ],
+            "expected": "不能；出处帮助核对但不保证正确。"
+          },
+          "result": {
+            "sources": [
+              {
+                "score": 7.156195759457453,
+                "source": "intro.md",
+                "paragraph": 3,
+                "text": "RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。"
+              }
+            ]
+          }
+        },
+        {
+          "case": {
+            "id": "test-02",
+            "split": "test",
+            "category": "answerable",
+            "question": "How are code changes tracked in Git?",
+            "relevant": [
+              4
+            ],
+            "expected": "As commits."
+          },
+          "result": {
+            "sources": [
+              {
+                "score": 4.912209041649819,
+                "source": "intro.md",
+                "paragraph": 4,
+                "text": "Git records code changes as commits."
+              }
+            ]
+          }
+        },
+        {
+          "case": {
+            "id": "test-03",
+            "split": "test",
+            "category": "answerable",
+            "question": "文本变成数值表示后，如何找到相近的材料？",
+            "relevant": [
+              2
+            ],
+            "expected": "通过向量相似度查找相关文档。"
+          },
+          "result": {
+            "sources": [
+              {
+                "score": 5.495930172507548,
+                "source": "intro.md",
+                "paragraph": 2,
+                "text": "向量检索将文本表示为向量，通过相似度查找相关文档。"
+              },
+              {
+                "score": 2.7607893943475474,
+                "source": "intro.md",
+                "paragraph": 1,
+                "text": "# 示例资料"
+              },
+              {
+                "score": 1.807387910217797,
+                "source": "intro.md",
+                "paragraph": 3,
+                "text": "RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。"
+              }
+            ]
+          }
+        },
+        {
+          "case": {
+            "id": "test-04",
+            "split": "test",
+            "category": "hard_negative",
+            "question": "RAG 的检索阶段在这台电脑上耗时多少毫秒？",
+            "relevant": [],
+            "expected": "证据没有耗时测量，不能给出毫秒数。"
+          },
+          "result": {
+            "sources": [
+              {
+                "score": 1.807387910217797,
+                "source": "intro.md",
+                "paragraph": 3,
+                "text": "RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。"
+              },
+              {
+                "score": 1.2113880632215868,
+                "source": "intro.md",
+                "paragraph": 2,
+                "text": "向量检索将文本表示为向量，通过相似度查找相关文档。"
+              }
+            ]
+          }
+        },
+        {
+          "case": {
+            "id": "test-05",
+            "split": "test",
+            "category": "hard_negative",
+            "question": "Git 请给出删除远程仓库的完整命令。",
+            "relevant": [],
+            "expected": "证据只有 Git 记录提交的介绍，不能据此提供删除命令。"
+          },
+          "result": {
+            "sources": [
+              {
+                "score": 1.6801710030518662,
+                "source": "intro.md",
+                "paragraph": 3,
+                "text": "RAG 先检索相关文档，再交给语言模型生成回答。出处可以帮助核对，但不保证答案正确。"
+              },
+              {
+                "score": 1.6374030138832731,
+                "source": "intro.md",
+                "paragraph": 4,
+                "text": "Git records code changes as commits."
+              }
+            ]
+          }
+        },
+        {
+          "case": {
+            "id": "test-06",
+            "split": "test",
+            "category": "no_match",
+            "question": "xxxxxxxx",
+            "relevant": [],
+            "expected": "无匹配，不调用模型。"
+          },
+          "result": {
+            "sources": []
+          }
+        }
+      ]
+    },
+    {
+      "suite": "multidoc",
+      "method": "tfidf",
+      "corpus_manifest": {
+        "lyra.md": "76a4aac4920fd5da894254d896413997a2332b55f401577f8f39375ef85401ea",
+        "orion_archived.md": "7151cb48281d5f58daae728f630dae6753cf9217fc78ddf85ba284ffaab233d6",
+        "orion_current.md": "7d0857dc4bf8ca0250bb9f222f99a7ce4adbab50ee62e5152c0a34c0e6b3c849",
+        "vega_a.md": "75fe1dbdf92c960616e80f609f6017529645c4e721b8397e2e52ee931f7a82df",
+        "vega_b.md": "9f371656309dd90fb4197c3551aa0ba8852e4bec90d8f1217dd4ee097ec3117c"
+      },
+      "cases_sha256": "9035715be55d6a36f6ef90d42295716cf60031e5c0b6800dff10e65b0187af02",
+      "summary": {
+        "cases": 4,
+        "errors": 0,
+        "answerable_cases": 3,
+        "answerable_recall_at_3": 1.0,
+        "answerable_mrr_at_3": 0.8333333333333334,
+        "answerable_hit_at_1": 0.6666666666666666,
+        "completed_negative_cases": 1,
+        "negative_cases_with_hits": 1,
+        "semantic_quality_evaluated": false
+      },
+      "results": [
+        {
+          "case": {
+            "id": "multi-test-01",
+            "split": "test",
+            "category": "answerable",
+            "question": "Orion 当前文档上传上限是多少？旧规则是否仍然适用？",
+            "relevant": [
+              {
+                "source": "orion_current.md",
+                "paragraph": 2
+              },
+              {
+                "source": "orion_archived.md",
+                "paragraph": 2
+              }
+            ],
+            "expected": "当前 20 MB，旧的 10 MB 已被替代；引用对应来源。"
+          },
+          "result": {
+            "sources": [
+              {
+                "score": 0.32328635593932165,
+                "source": "lyra.md",
+                "paragraph": 2,
+                "text": "Lyra 文档上传上限为每个文件 50 MB。Lyra 是另一个虚构产品，不能用此规则回答 Orion 的问题。"
+              },
+              {
+                "score": 0.2975620135474149,
+                "source": "orion_current.md",
+                "paragraph": 2,
+                "text": "Orion 文档上传上限：2026-10-01 起生效的当前规则为每个文件 20 MB，替代 2026-09-01 的旧规则。仅用于测试，不对应真实产品。"
+              },
+              {
+                "score": 0.2667451677616064,
+                "source": "orion_archived.md",
+                "paragraph": 2,
+                "text": "Orion 文档上传上限：2026-09-01 的旧规则为每个文件 10 MB；此规则已归档，由 2026-10-01 起生效的新规则替代。"
+              }
+            ]
+          }
+        },
+        {
+          "case": {
+            "id": "multi-test-02",
+            "split": "test",
+            "category": "answerable",
+            "question": "Orion 文档支持 PDF 吗？",
+            "relevant": [
+              {
+                "source": "orion_current.md",
+                "paragraph": 3
+              }
+            ],
+            "expected": "不支持；支持 Markdown 和 TXT。"
+          },
+          "result": {
+            "sources": [
+              {
+                "score": 0.4816617837613814,
+                "source": "orion_current.md",
+                "paragraph": 3,
+                "text": "Orion 文档支持 Markdown 和 TXT；不支持 PDF。当前规则没有提供并发用户数或响应耗时。"
+              },
+              {
+                "score": 0.11236107719768024,
+                "source": "orion_archived.md",
+                "paragraph": 2,
+                "text": "Orion 文档上传上限：2026-09-01 的旧规则为每个文件 10 MB；此规则已归档，由 2026-10-01 起生效的新规则替代。"
+              },
+              {
+                "score": 0.10141639278773965,
+                "source": "lyra.md",
+                "paragraph": 2,
+                "text": "Lyra 文档上传上限为每个文件 50 MB。Lyra 是另一个虚构产品，不能用此规则回答 Orion 的问题。"
+              }
+            ]
+          }
+        },
+        {
+          "case": {
+            "id": "multi-test-03",
+            "split": "test",
+            "category": "answerable",
+            "question": "Vega 文档保留期限是多少天？记录是否一致？",
+            "relevant": [
+              {
+                "source": "vega_a.md",
+                "paragraph": 2
+              },
+              {
+                "source": "vega_b.md",
+                "paragraph": 2
+              }
+            ],
+            "expected": "记录 A 为 7 天，B 为 30 天；资料冲突且无法判定优先级，不可任选一个作为最终规则。"
+          },
+          "result": {
+            "sources": [
+              {
+                "score": 0.31747829975332764,
+                "source": "vega_a.md",
+                "paragraph": 2,
+                "text": "Vega 文档保留期限：记录 A 写为 7 天。没有生效日期，也没有声明其优先级。"
+              },
+              {
+                "score": 0.31747829975332764,
+                "source": "vega_b.md",
+                "paragraph": 2,
+                "text": "Vega 文档保留期限：记录 B 写为 30 天。没有生效日期，也没有声明其优先级。"
+              },
+              {
+                "score": 0.20566878052144066,
+                "source": "lyra.md",
+                "paragraph": 2,
+                "text": "Lyra 文档上传上限为每个文件 50 MB。Lyra 是另一个虚构产品，不能用此规则回答 Orion 的问题。"
+              }
+            ]
+          }
+        },
+        {
+          "case": {
+            "id": "multi-test-04",
+            "split": "test",
+            "category": "hard_negative",
+            "question": "Orion 文档系统最多支持多少并发用户？",
+            "relevant": [],
+            "expected": "资料未提供并发用户数，应说明证据不足。"
+          },
+          "result": {
+            "sources": [
+              {
+                "score": 0.37113536069023473,
+                "source": "orion_current.md",
+                "paragraph": 3,
+                "text": "Orion 文档支持 Markdown 和 TXT；不支持 PDF。当前规则没有提供并发用户数或响应耗时。"
+              },
+              {
+                "score": 0.07983212406254267,
+                "source": "lyra.md",
+                "paragraph": 2,
+                "text": "Lyra 文档上传上限为每个文件 50 MB。Lyra 是另一个虚构产品，不能用此规则回答 Orion 的问题。"
+              },
+              {
+                "score": 0.07003753228350412,
+                "source": "orion_current.md",
+                "paragraph": 2,
+                "text": "Orion 文档上传上限：2026-10-01 起生效的当前规则为每个文件 20 MB，替代 2026-09-01 的旧规则。仅用于测试，不对应真实产品。"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "suite": "multidoc",
+      "method": "bm25",
+      "corpus_manifest": {
+        "lyra.md": "76a4aac4920fd5da894254d896413997a2332b55f401577f8f39375ef85401ea",
+        "orion_archived.md": "7151cb48281d5f58daae728f630dae6753cf9217fc78ddf85ba284ffaab233d6",
+        "orion_current.md": "7d0857dc4bf8ca0250bb9f222f99a7ce4adbab50ee62e5152c0a34c0e6b3c849",
+        "vega_a.md": "75fe1dbdf92c960616e80f609f6017529645c4e721b8397e2e52ee931f7a82df",
+        "vega_b.md": "9f371656309dd90fb4197c3551aa0ba8852e4bec90d8f1217dd4ee097ec3117c"
+      },
+      "cases_sha256": "9035715be55d6a36f6ef90d42295716cf60031e5c0b6800dff10e65b0187af02",
+      "summary": {
+        "cases": 4,
+        "errors": 0,
+        "answerable_cases": 3,
+        "answerable_recall_at_3": 1.0,
+        "answerable_mrr_at_3": 1.0,
+        "answerable_hit_at_1": 1.0,
+        "completed_negative_cases": 1,
+        "negative_cases_with_hits": 1,
+        "semantic_quality_evaluated": false
+      },
+      "results": [
+        {
+          "case": {
+            "id": "multi-test-01",
+            "split": "test",
+            "category": "answerable",
+            "question": "Orion 当前文档上传上限是多少？旧规则是否仍然适用？",
+            "relevant": [
+              {
+                "source": "orion_current.md",
+                "paragraph": 2
+              },
+              {
+                "source": "orion_archived.md",
+                "paragraph": 2
+              }
+            ],
+            "expected": "当前 20 MB，旧的 10 MB 已被替代；引用对应来源。"
+          },
+          "result": {
+            "sources": [
+              {
+                "score": 9.155429176771664,
+                "source": "orion_current.md",
+                "paragraph": 2,
+                "text": "Orion 文档上传上限：2026-10-01 起生效的当前规则为每个文件 20 MB，替代 2026-09-01 的旧规则。仅用于测试，不对应真实产品。"
+              },
+              {
+                "score": 8.494085356899598,
+                "source": "lyra.md",
+                "paragraph": 2,
+                "text": "Lyra 文档上传上限为每个文件 50 MB。Lyra 是另一个虚构产品，不能用此规则回答 Orion 的问题。"
+              },
+              {
+                "score": 7.384023524802633,
+                "source": "orion_archived.md",
+                "paragraph": 2,
+                "text": "Orion 文档上传上限：2026-09-01 的旧规则为每个文件 10 MB；此规则已归档，由 2026-10-01 起生效的新规则替代。"
+              }
+            ]
+          }
+        },
+        {
+          "case": {
+            "id": "multi-test-02",
+            "split": "test",
+            "category": "answerable",
+            "question": "Orion 文档支持 PDF 吗？",
+            "relevant": [
+              {
+                "source": "orion_current.md",
+                "paragraph": 3
+              }
+            ],
+            "expected": "不支持；支持 Markdown 和 TXT。"
+          },
+          "result": {
+            "sources": [
+              {
+                "score": 8.84590057004668,
+                "source": "orion_current.md",
+                "paragraph": 3,
+                "text": "Orion 文档支持 Markdown 和 TXT；不支持 PDF。当前规则没有提供并发用户数或响应耗时。"
+              },
+              {
+                "score": 1.889037674095982,
+                "source": "orion_archived.md",
+                "paragraph": 2,
+                "text": "Orion 文档上传上限：2026-09-01 的旧规则为每个文件 10 MB；此规则已归档，由 2026-10-01 起生效的新规则替代。"
+              },
+              {
+                "score": 1.767283320200666,
+                "source": "lyra.md",
+                "paragraph": 2,
+                "text": "Lyra 文档上传上限为每个文件 50 MB。Lyra 是另一个虚构产品，不能用此规则回答 Orion 的问题。"
+              }
+            ]
+          }
+        },
+        {
+          "case": {
+            "id": "multi-test-03",
+            "split": "test",
+            "category": "answerable",
+            "question": "Vega 文档保留期限是多少天？记录是否一致？",
+            "relevant": [
+              {
+                "source": "vega_a.md",
+                "paragraph": 2
+              },
+              {
+                "source": "vega_b.md",
+                "paragraph": 2
+              }
+            ],
+            "expected": "记录 A 为 7 天，B 为 30 天；资料冲突且无法判定优先级，不可任选一个作为最终规则。"
+          },
+          "result": {
+            "sources": [
+              {
+                "score": 10.862021363969172,
+                "source": "vega_a.md",
+                "paragraph": 2,
+                "text": "Vega 文档保留期限：记录 A 写为 7 天。没有生效日期，也没有声明其优先级。"
+              },
+              {
+                "score": 10.862021363969172,
+                "source": "vega_b.md",
+                "paragraph": 2,
+                "text": "Vega 文档保留期限：记录 B 写为 30 天。没有生效日期，也没有声明其优先级。"
+              },
+              {
+                "score": 5.382237389023256,
+                "source": "lyra.md",
+                "paragraph": 2,
+                "text": "Lyra 文档上传上限为每个文件 50 MB。Lyra 是另一个虚构产品，不能用此规则回答 Orion 的问题。"
+              }
+            ]
+          }
+        },
+        {
+          "case": {
+            "id": "multi-test-04",
+            "split": "test",
+            "category": "hard_negative",
+            "question": "Orion 文档系统最多支持多少并发用户？",
+            "relevant": [],
+            "expected": "资料未提供并发用户数，应说明证据不足。"
+          },
+          "result": {
+            "sources": [
+              {
+                "score": 13.702069561198046,
+                "source": "orion_current.md",
+                "paragraph": 3,
+                "text": "Orion 文档支持 Markdown 和 TXT；不支持 PDF。当前规则没有提供并发用户数或响应耗时。"
+              },
+              {
+                "score": 2.7969198223181033,
+                "source": "lyra.md",
+                "paragraph": 2,
+                "text": "Lyra 文档上传上限为每个文件 50 MB。Lyra 是另一个虚构产品，不能用此规则回答 Orion 的问题。"
+              },
+              {
+                "score": 2.438179847011753,
+                "source": "orion_current.md",
+                "paragraph": 2,
+                "text": "Orion 文档上传上限：2026-10-01 起生效的当前规则为每个文件 20 MB，替代 2026-09-01 的旧规则。仅用于测试，不对应真实产品。"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

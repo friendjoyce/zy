@@ -2,7 +2,7 @@ import argparse
 import json
 import re
 from collections import Counter
-from math import log, sqrt
+from math import log, sqrt, isfinite
 from pathlib import Path
 from functools import lru_cache
 
@@ -50,10 +50,12 @@ def search(root, query, limit=3, min_score=0.0, method='jaccard', *, rerank='non
     root = Path(root)
     if not root.is_dir() or limit < 1:
         raise ValueError('Document directory must exist and limit must be positive')
-    if not 0 <= min_score <= 1:
+    if method not in {'jaccard', 'tfidf', 'bm25'}:
+        raise ValueError("method must be 'jaccard', 'tfidf' or 'bm25'")
+    if method == 'bm25' and (not isfinite(min_score) or min_score < 0):
+        raise ValueError('BM25 min_score must be finite and nonnegative')
+    if method != 'bm25' and not 0 <= min_score <= 1:
         raise ValueError('min_score must be between 0 and 1')
-    if method not in {'jaccard', 'tfidf'}:
-        raise ValueError("method must be 'jaccard' or 'tfidf'")
     if rerank not in {'none', 'title'}:
         raise ValueError("rerank must be 'none' or 'title'")
     if chunking not in {'paragraph', 'heading_context'}:
@@ -74,14 +76,29 @@ def search(root, query, limit=3, min_score=0.0, method='jaccard', *, rerank='non
                 passages = contextual_passages(passages)
             for number, text, words in passages:
                 documents.append((path, number, text, words))
+    if method == 'bm25':
+        documents = [item for item in documents if item[3]]
     document_frequency = Counter(token for _, _, _, words in documents for token in set(words))
     total_documents = len(documents)
+    counts = [Counter(re.findall(r'[a-z0-9_]+|[\u4e00-\u9fff]', text.lower()))
+              for _, text_number, text, _ in documents] if method == 'bm25' else []
+    average_length = sum(sum(c.values()) for c in counts) / len(counts) if counts else 0
     hits = []
-    for path, number, text, words in documents:
+    for index, (path, number, text, words) in enumerate(documents):
         overlap = query & words
         if not overlap:
             continue
-        if method == 'tfidf':
+        if method == 'bm25':
+            word_counts = counts[index]
+            length = sum(word_counts.values())
+            k1, b = 1.2, 0.75
+            norm = k1 * (1 - b + b * length / average_length)
+            # Query terms are deduplicated; scores are raw, not probabilities.
+            score = sum(log(1 + (total_documents - document_frequency[token] + 0.5)
+                            / (document_frequency[token] + 0.5))
+                        * word_counts[token] * (k1 + 1) / (word_counts[token] + norm)
+                        for token in overlap)
+        elif method == 'tfidf':
             word_counts = Counter(re.findall(r'[a-z0-9_]+|[\u4e00-\u9fff]', text.lower()))
             def weight(token):
                 return 1 + log((total_documents + 1) / (document_frequency[token] + 1))
@@ -105,10 +122,10 @@ def main():
     parser.add_argument('query')
     parser.add_argument('--docs', default='docs')
     parser.add_argument('--top-k', type=int, default=3)
-    parser.add_argument('--method', choices=['jaccard', 'tfidf'], default='jaccard',
+    parser.add_argument('--method', choices=['jaccard', 'tfidf', 'bm25'], default='jaccard',
                         help='Scoring method (default: jaccard)')
     parser.add_argument('--min-score', type=float, default=0.0,
-                        help='Minimum similarity, from 0 to 1 (default: 0)')
+                        help='Minimum score: 0-1 for Jaccard/TF-IDF; any finite nonnegative value for BM25')
     parser.add_argument('--json', action='store_true', help='Emit structured results for other programs')
     parser.add_argument('--rerank', choices=['none', 'title'], default='none')
     parser.add_argument('--chunking', choices=['paragraph', 'heading_context'], default='paragraph')

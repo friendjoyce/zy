@@ -39,10 +39,10 @@ def main():
     parser.add_argument('--docs', default='docs')
     parser.add_argument('--cases', default='evaluation/cases.json')
     parser.add_argument('--top-k', type=int, default=3)
-    parser.add_argument('--method', choices=['jaccard', 'tfidf'], default='jaccard',
+    parser.add_argument('--method', choices=['jaccard', 'tfidf', 'bm25'], default='jaccard',
                         help='Scoring method (default: jaccard)')
     parser.add_argument('--min-score', type=float, default=0.0,
-                        help='Minimum retrieval similarity, from 0 to 1 (default: 0)')
+                        help='Minimum score: 0-1 for Jaccard/TF-IDF; finite nonnegative value for BM25')
     args = parser.parse_args()
     try:
         cases = json.loads(Path(args.cases).read_text(encoding='utf-8-sig'))

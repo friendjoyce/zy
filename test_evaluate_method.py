@@ -14,4 +14,4 @@ class EvaluationMethodTests(unittest.TestCase):
 
     def test_invalid_method_is_rejected(self):
         with self.assertRaises(ValueError):
-            evaluate(".", [{"query": "x", "relevant": [{"source": "x", "paragraph": 1}]}], 1, method="bm25")
+            evaluate(".", [{"query": "x", "relevant": [{"source": "x", "paragraph": 1}]}], 1, method="unsupported")

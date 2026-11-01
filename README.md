@@ -24,7 +24,7 @@ python -m unittest -v
 
 ## 限制
 
-`--min-score` 可过滤低相似度结果，范围为 0 到 1，默认 0 保持原有行为。等于阈值的匹配会保留；没有词重叠的段落始终不返回。阈值越高可能漏掉相关内容，应结合自己的评估题集调整；它不是置信度或答案正确率。
+`--min-score` 可过滤低分结果。Jaccard/TF-IDF 范围为 0 到 1；BM25 接受有限非负值，分数可能大于 1。默认 0 保持原有行为。等于阈值的匹配会保留；没有词重叠的段落始终不返回。阈值越高可能漏掉相关内容，应结合自己的评估题集调整；它不是置信度或答案正确率。
 
 使用 `--json` 输出可供其他程序读取的 JSON 数组，每项包含 `score`、`source`、`paragraph`、`text`。无匹配时输出 `[]`。路径统一使用 `/`，中文以 JSON Unicode 转义输出，解析后保持原文，便于 Windows 管道传输。非法参数仍返回非零退出码并向标准错误输出提示。
 
@@ -225,6 +225,21 @@ python evaluate_qa.py --validate-only --docs evaluation/multidoc/docs --cases ev
 校验失败发生在模型调用和报告写入前，命令行返回参数错误码 2。Python `run()` 也校验传入的题目列表；如果调用方已筛选 split，它只能检查该子集，跨划分重复需要对完整题集运行 `--validate-only`。
 
 这不是语义标注审核：不能证明问题确实有答案、负例确实无答案，也不能发现编号仍存在但文本含义已改变的情况。语料哈希用于追踪变化，标签仍需人工复核；旧的 `evaluate.py` 检索题集格式不适用此校验器。
+
+### BM25 检索基线
+
+`search.py` 与 `evaluate.py` 支持 `--method bm25`，Python 使用 `search(..., method="bm25")`。当前问答入口和网页继续使用 TF-IDF，BM25 暂作为独立检索基线。
+
+```powershell
+python search.py "Orion 当前上传上限" --docs evaluation/multidoc/docs --method bm25 --json
+python evaluate.py --method bm25 --top-k 3
+python compare_bm25.py --split dev --output ../bm25-results/dev.json
+python compare_bm25.py --split test --output ../bm25-results/test.json
+```
+
+计分使用固定 k1=1.2、b=0.75：对去重后的查询词项求和 `IDF(t) * f(t,d) * (k1+1) / (f(t,d) + k1*(1-b+b*dl/avgdl))`，其中 `IDF(t)=ln(1+(N-df(t)+0.5)/(df(t)+0.5))`。N 只统计有词项的段落，dl 为词项总次数，avgdl 为这些段落的平均长度；空段落不参与 BM25 统计。参数含义和 IDF 参考 [Lucene BM25 文档](https://lucene.apache.org/core/9_12_1/core/org/apache/lucene/search/similarities/BM25Similarity.html)，这是 Python 基线实现，不声称逐分值复现 Lucene。
+
+原始分数没有压缩到 0–1，不能当作概率，也不应与 TF-IDF 分数直接比较。现有题集实测见 `evaluation/bm25/REVIEW.md`：多文档测试三道可回答题的首条命中由 2/3 到 3/3，其余套题指标持平。小样本结果尚不足以决定更改默认算法。
 
 ### 持续集成检查
 

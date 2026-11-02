@@ -41,8 +41,19 @@ class WebAPITests(unittest.TestCase):
         self.assertNotIn('# 虚构测试资料', first['original_text'])
         self.assertIn('20 MB', first['original_text'])
 
+    def test_bm25_sources_match_search(self):
+        from search import search
+        from app import CORPORA
+        query = 'Orion 当前文档上传上限是多少？旧规则是否仍然适用？'
+        status, body = self.post({'question': query, 'corpus': 'multidoc', 'method': 'bm25'})
+        self.assertEqual(status, 200)
+        self.assertEqual(body['settings']['method'], 'bm25')
+        expected = search(CORPORA['multidoc'], query, method='bm25')
+        self.assertEqual([(s['score'], s['source'], s['paragraph']) for s in body['sources']],
+                         [(score, source.replace('\\', '/'), paragraph) for score, source, paragraph, _ in expected])
+
     def test_invalid_options_rejected(self):
-        for key in ['corpus', 'rerank', 'chunking']:
+        for key in ['corpus', 'rerank', 'chunking', 'method']:
             for value in ['../../private', [], None]:
                 self.assertEqual(self.post({'question': 'RAG', key: value})[0], 400)
         self.assertEqual(self.post({'question': 'RAG', 'generate': 'yes'})[0], 400)
@@ -53,7 +64,7 @@ class WebAPITests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(body['mode'], 'no_evidence')
         self.assertEqual(body['sources'], [])
-        self.assertEqual(body['settings'], {'corpus': 'intro', 'rerank': 'none', 'chunking': 'paragraph'})
+        self.assertEqual(body['settings'], {'corpus': 'intro', 'rerank': 'none', 'chunking': 'paragraph', 'method': 'tfidf'})
 
 
 if __name__ == '__main__':

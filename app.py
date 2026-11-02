@@ -18,6 +18,7 @@ def ask_request(data):
         raise ValueError('Expected JSON object and boolean generate')
     options = {}
     for key, choices, default in [('corpus', CORPORA, 'intro'),
+                                  ('method', ('tfidf', 'bm25'), 'tfidf'),
                                   ('rerank', ('none', 'title'), 'none'),
                                   ('chunking', ('paragraph', 'heading_context'), 'paragraph')]:
         value = data.get(key, default)
@@ -26,7 +27,7 @@ def ask_request(data):
         options[key] = value
     docs = CORPORA[options['corpus']]
     report = ask(data.get('question'), data.get('generate', False), docs=docs,
-                 rerank=options['rerank'], chunking=options['chunking'])
+                 rerank=options['rerank'], chunking=options['chunking'], method=options['method'])
     for source in report['sources']:
         path = docs / source['source']
         stat = path.stat()
@@ -36,11 +37,11 @@ def ask_request(data):
     return report
 
 
-def ask(question, generate=False, *, docs=None, rerank='none', chunking='paragraph'):
+def ask(question, generate=False, *, docs=None, rerank='none', chunking='paragraph', method='tfidf'):
     started = time.perf_counter()
     if not isinstance(question, str) or not 1 <= len(question.strip()) <= 2000:
         raise ValueError('Question must contain 1-2000 characters')
-    report = answer(ROOT / 'docs' if docs is None else docs, question, rerank=rerank, chunking=chunking)
+    report = answer(ROOT / 'docs' if docs is None else docs, question, rerank=rerank, chunking=chunking, method=method)
     if generate and report['sources']:
         model = os.environ.get('OLLAMA_MODEL')
         if not model:

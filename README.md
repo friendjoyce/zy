@@ -228,7 +228,7 @@ python evaluate_qa.py --validate-only --docs evaluation/multidoc/docs --cases ev
 
 ### BM25 检索基线
 
-`search.py` 与 `evaluate.py` 支持 `--method bm25`，Python 使用 `search(..., method="bm25")`。当前问答入口和网页继续使用 TF-IDF，BM25 暂作为独立检索基线。
+`search.py` 与 `evaluate.py` 支持 `--method bm25`，Python 使用 `search(..., method="bm25")`。问答入口和网页默认使用 TF-IDF，现可显式选择 BM25。
 
 ```powershell
 python search.py "Orion 当前上传上限" --docs evaluation/multidoc/docs --method bm25 --json
@@ -248,3 +248,11 @@ python compare_bm25.py --split test --output ../bm25-results/test.json
 流水线不安装或下载 Ollama 模型，不使用 API 密钥，不运行真实推理或浏览器交互。绿色状态只代表上述检查通过，不代表答案质量、模型可用性或生产安全。正式生成验证仍需本机运行。工作流仅有仓库内容读取权限；未设置分支保护，因此失败不会自动撤销已经推送的提交，也不保证阻止合并。
 
 官方 Action 用完整提交 SHA 固定版本，配置参考 [checkout](https://github.com/actions/checkout) 与 [setup-python](https://github.com/actions/setup-python) 的文档。后续升级需核对新版本后更新 SHA。
+
+### 问答算法选择
+
+网页新增“检索算法”选项，可选择 TF-IDF 或 BM25；默认 TF-IDF。修改后重新启动 app.py 并刷新页面即可使用。API 的可选 `method` 字段只接受 `tfidf`、`bm25`，非法值返回 400，响应 settings 记录实际算法。
+
+命令行：`python qa.py "Orion 当前上传上限" --docs evaluation/multidoc/docs --method bm25`。Python 的 answer/ask 接受 `method="bm25"`，可与已有重排和分块选项组合。evaluate_qa.py 仍默认使用 TF-IDF；算法对照使用 compare_bm25.py，不要将之前的 QA 报告描述为 BM25 结果。
+
+页面将分数标为“检索分数”：BM25 可以大于 1，不是概率，也不能与 TF-IDF 数值直接比较。本轮真实 HTTP 测试验证算法选项和来源一致性，完整本地检查通过；尚未为此改动重新执行浏览器点击或模型生成测试。

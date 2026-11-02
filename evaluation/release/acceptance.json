@@ -1,0 +1,199 @@
+{
+  "timestamp": "2026-11-02T03:33:48.268976+00:00",
+  "model": "qwen3:4b",
+  "semantic_quality_evaluated": false,
+  "results": [
+    {
+      "id": "rules",
+      "request": {
+        "question": "Orion 当前文档上传上限是多少？旧规则是否仍然适用？",
+        "generate": true,
+        "corpus": "multidoc",
+        "method": "bm25",
+        "rerank": "none",
+        "chunking": "heading_context"
+      },
+      "response": {
+        "mode": "generated",
+        "answer": "Orion's current document upload limit is 20 MB per file. The old rule is no longer applicable. [1]",
+        "sources": [
+          {
+            "id": 1,
+            "source": "orion_current.md",
+            "paragraph": 2,
+            "text": "# 虚构测试资料：Orion 当前规则\n\nOrion 文档上传上限：2026-10-01 起生效的当前规则为每个文件 20 MB，替代 2026-09-01 的旧规则。仅用于测试，不对应真实产品。",
+            "score": 7.967134397526071,
+            "original_text": "Orion 文档上传上限：2026-10-01 起生效的当前规则为每个文件 20 MB，替代 2026-09-01 的旧规则。仅用于测试，不对应真实产品。"
+          },
+          {
+            "id": 2,
+            "source": "lyra.md",
+            "paragraph": 2,
+            "text": "# 虚构测试资料：Lyra 规则\n\nLyra 文档上传上限为每个文件 50 MB。Lyra 是另一个虚构产品，不能用此规则回答 Orion 的问题。",
+            "score": 6.009812499089678,
+            "original_text": "Lyra 文档上传上限为每个文件 50 MB。Lyra 是另一个虚构产品，不能用此规则回答 Orion 的问题。"
+          },
+          {
+            "id": 3,
+            "source": "orion_current.md",
+            "paragraph": 3,
+            "text": "# 虚构测试资料：Orion 当前规则\n\nOrion 文档支持 Markdown 和 TXT；不支持 PDF。当前规则没有提供并发用户数或响应耗时。",
+            "score": 5.652341581727234,
+            "original_text": "Orion 文档支持 Markdown 和 TXT；不支持 PDF。当前规则没有提供并发用户数或响应耗时。"
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 40540.47,
+        "settings": {
+          "corpus": "multidoc",
+          "method": "bm25",
+          "rerank": "none",
+          "chunking": "heading_context"
+        }
+      },
+      "transport_pass": true
+    },
+    {
+      "id": "conflict",
+      "request": {
+        "question": "Vega 文档保留期限是多少天？记录是否一致？",
+        "generate": true,
+        "corpus": "multidoc",
+        "method": "bm25",
+        "rerank": "none",
+        "chunking": "heading_context"
+      },
+      "response": {
+        "mode": "generated",
+        "answer": "Vega 文档保留期限不一致，记录 A 为 7 天，记录 B 为 30 天。[1][2]",
+        "sources": [
+          {
+            "id": 1,
+            "source": "vega_a.md",
+            "paragraph": 2,
+            "text": "# 虚构测试资料：Vega 记录 A\n\nVega 文档保留期限：记录 A 写为 7 天。没有生效日期，也没有声明其优先级。",
+            "score": 9.573044294396073,
+            "original_text": "Vega 文档保留期限：记录 A 写为 7 天。没有生效日期，也没有声明其优先级。"
+          },
+          {
+            "id": 2,
+            "source": "vega_b.md",
+            "paragraph": 2,
+            "text": "# 虚构测试资料：Vega 记录 B\n\nVega 文档保留期限：记录 B 写为 30 天。没有生效日期，也没有声明其优先级。",
+            "score": 9.573044294396073,
+            "original_text": "Vega 文档保留期限：记录 B 写为 30 天。没有生效日期，也没有声明其优先级。"
+          },
+          {
+            "id": 3,
+            "source": "lyra.md",
+            "paragraph": 2,
+            "text": "# 虚构测试资料：Lyra 规则\n\nLyra 文档上传上限为每个文件 50 MB。Lyra 是另一个虚构产品，不能用此规则回答 Orion 的问题。",
+            "score": 3.535074487719828,
+            "original_text": "Lyra 文档上传上限为每个文件 50 MB。Lyra 是另一个虚构产品，不能用此规则回答 Orion 的问题。"
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 17649.67,
+        "settings": {
+          "corpus": "multidoc",
+          "method": "bm25",
+          "rerank": "none",
+          "chunking": "heading_context"
+        }
+      },
+      "transport_pass": true
+    },
+    {
+      "id": "unknown",
+      "request": {
+        "question": "Orion 文档系统最多支持多少并发用户？",
+        "generate": true,
+        "corpus": "multidoc",
+        "method": "bm25",
+        "rerank": "none",
+        "chunking": "heading_context"
+      },
+      "response": {
+        "mode": "generated",
+        "answer": "根据提供的证据，Orion 文档系统当前规则中未明确说明并发用户数支持上限。证据 [1] 明确指出：\"当前规则没有提供并发用户数或响应耗时\"。因此，**缺乏足够证据**回答该问题。  \n\n**答案**：无相关证据支持（当前规则未提供并发用户数信息）。  \n**依据**：[1]",
+        "sources": [
+          {
+            "id": 1,
+            "source": "orion_current.md",
+            "paragraph": 3,
+            "text": "# 虚构测试资料：Orion 当前规则\n\nOrion 文档支持 Markdown 和 TXT；不支持 PDF。当前规则没有提供并发用户数或响应耗时。",
+            "score": 10.649705511295428,
+            "original_text": "Orion 文档支持 Markdown 和 TXT；不支持 PDF。当前规则没有提供并发用户数或响应耗时。"
+          },
+          {
+            "id": 2,
+            "source": "orion_current.md",
+            "paragraph": 2,
+            "text": "# 虚构测试资料：Orion 当前规则\n\nOrion 文档上传上限：2026-10-01 起生效的当前规则为每个文件 20 MB，替代 2026-09-01 的旧规则。仅用于测试，不对应真实产品。",
+            "score": 1.353714323376249,
+            "original_text": "Orion 文档上传上限：2026-10-01 起生效的当前规则为每个文件 20 MB，替代 2026-09-01 的旧规则。仅用于测试，不对应真实产品。"
+          },
+          {
+            "id": 3,
+            "source": "lyra.md",
+            "paragraph": 2,
+            "text": "# 虚构测试资料：Lyra 规则\n\nLyra 文档上传上限为每个文件 50 MB。Lyra 是另一个虚构产品，不能用此规则回答 Orion 的问题。",
+            "score": 1.3246448400829292,
+            "original_text": "Lyra 文档上传上限为每个文件 50 MB。Lyra 是另一个虚构产品，不能用此规则回答 Orion 的问题。"
+          }
+        ],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": true,
+          "semantic_verification": false
+        },
+        "latency_ms": 7593.46,
+        "settings": {
+          "corpus": "multidoc",
+          "method": "bm25",
+          "rerank": "none",
+          "chunking": "heading_context"
+        }
+      },
+      "transport_pass": true
+    },
+    {
+      "id": "no_match",
+      "request": {
+        "question": "zzzzzzzz",
+        "generate": true,
+        "corpus": "multidoc",
+        "method": "bm25",
+        "rerank": "none",
+        "chunking": "heading_context"
+      },
+      "response": {
+        "mode": "no_evidence",
+        "answer": "No matching evidence.",
+        "sources": [],
+        "citation_check": {
+          "unknown_ids": [],
+          "has_citations": false,
+          "semantic_verification": false
+        },
+        "latency_ms": 1.67,
+        "settings": {
+          "corpus": "multidoc",
+          "method": "bm25",
+          "rerank": "none",
+          "chunking": "heading_context"
+        }
+      },
+      "transport_pass": true
+    }
+  ],
+  "complete": true
+}
